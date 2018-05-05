@@ -1,0 +1,110 @@
+{
+    "LINEAR": {
+        "desc": "Representation of the linear activation function (Vertex)",
+        "value": 0
+    },
+    "RELU": {
+        "desc": "Representation of the ReLu activation function (Vertex)",
+        "value": 1
+    },
+    "NO_ACTION": {
+        "desc": "Representation of not performing an action on the input edges (Vertex)",
+        "value": 0
+    },
+    "SUM": {
+        "desc": "Representation of performing a sum of the input edges (Vertex)",
+        "value": 1
+    },
+    "CONCATENATION": {
+        "desc": "Representation of performing a concatenation of the input edges (Vertex)",
+        "value": 2
+    },
+    "FULLY_CONNECTED": {
+        "desc": "Representation of a fully connected layer (Edge)",
+        "value": 0
+    },
+    "CONVOLUTIONNAL": {
+        "desc": "Representation of a convolutionnal layer (Edge)",
+        "value": 1
+    },
+    "DEFAULT_UNITS": {
+        "desc": "Default units for fully connected layers (Edge)",
+        "value": 128
+    },
+    "DEFAULT_KERNELS": {
+        "desc": "Default kernels for convolutionnal layers (Edge)",
+        "value": 16
+    },
+    "DEFAULT_KERNEL_SHAPE": {
+        "desc": "Default kernel shape for convolutionnal layers (Edge)",
+        "value": [3, 3]
+    },
+    "DEFAULT_STRIDE": {
+        "desc": "Default stride for convolutionnal layers (Edge)",
+        "value": [1, 1]
+    },
+    "INPUT_SHAPE": {
+        "desc": "Shape of the neural network input",
+        "value": [28, 28]
+    },
+    "OUTPUT_SHAPE": {
+        "desc": "Shape of the neural network output",
+        "value": 10
+    },
+    "DROPOUT_RATE": {
+        "desc": "Dropout rate of the Dropout layers",
+        "value": 0.5
+    },
+    "MINIBATCH_SIZE": {
+        "desc": "Number of training cases over which each stochastic gradient descent (SGD) update is computed",
+        "value": 64
+    },
+    "NORMALIZATION_EPSILON": {
+        "desc": "Epsilon used in batch normalization",
+        "value": 1e-10
+    },
+    "MOMENTUM": {
+        "desc": "Nesterov Momentum (learning parameter)",
+        "value": 0.9
+    },
+    "LEARNING_RATE": {
+        "desc": "Optimizer learning rate",
+        "value": 0.001
+    },
+    "NUM_CHANNELS": {
+        "desc": "Number of electrodes recording the EEG signals (channels)",
+        "value": 32
+    },
+    "NUM_EVENTS": {
+        "desc": "Number of possible hand motion events to be classified",
+        "value": 6
+    },
+    "NUM_SERIES": {
+        "desc": "Number of series per subject",
+        "value": 8
+    },
+    "NUM_SUBJECTS": {
+        "desc": "Number of subjects",
+        "value": 12
+    },
+    "SAMPLE_LENGTH": {
+        "desc": "Length of a sample that represents an input of the model (3584 is ~7 seconds of signal)",
+        "value": 3584
+    },
+    "SERIES_TRAINING_INDICES": {
+        "desc": "Indices of the series used for training the model during the training/validatioh phase",
+        "value": [0, 1, 3, 4, 6, 7]
+    },
+    "SERIES_VALIDATION_INDICES": {
+        "desc": "Indices of the series used for validating the model during the training/validatioh phase",
+        "value": [2, 5]
+    },
+    "TRAIN_AGG_DATA_PATH": {
+        "desc": "Data path folder",
+        "value": "../../data/train/aggregated/"
+    },
+    "TRAIN_DATA_CSV_PATH": {
+        "desc": "Data path folder",
+        "value": "../../data/train/"
+    }
+}
