@@ -34,3 +34,7 @@ class Edge:
         
         else:
             raise UnknownLayerException()
+
+    
+    def is_vertex(self):
+        return(False)

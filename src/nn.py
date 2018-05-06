@@ -109,7 +109,32 @@ class NN:
         Iteratively build the Neural Network layers following the DNA graph
         """
         while(len(self.queue) > 0):
-            print("Do something")
+            
+            graph_object = self.queue.popleft()
+
+            if(graph_object.is_vertex()):
+
+                # create tensor from vertex object
+                tensor = self.from_vertex_to_tensor(graph_object)
+
+                # add the resulting tensor in the vertices dictionary
+                self.vertices_tensor[graph_object.id] = tensor
+
+                # push all outgoing edges to the queue
+                for edge_out in graph_object.edges_out:
+                    self.queue.append(edge_out)
+
+            else:
+
+                # create tensor from edge object
+                tensor = self.from_edge_to_tensor(graph_object)
+
+                # add the resulting tensor in the edges dictionary
+                self.edges_tensor[graph_object.id] = tensor
+
+                # push the destination vertex to the queue
+                self.queue.append(graph_object.to_vertex)
+
 
 
         """

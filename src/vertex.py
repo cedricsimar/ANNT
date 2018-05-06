@@ -41,4 +41,7 @@ class Vertex:
             self.edges_out.remove(edge)
         else:
             ImmutableException()
+
+    def is_vertex(self):
+        return(True)
         
