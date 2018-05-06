@@ -9,6 +9,8 @@ import tensorflow as tf
 from tensorflow.python.ops import array_ops as tf_array_ops
 from tensorflow.python.ops.init_ops import glorot_uniform_initializer
 
+from vertex import Vertex
+from edge import Edge
 
 class NN:
 
@@ -73,11 +75,24 @@ class NN:
                 except AttributeError as e:
                     print(e)
 
-    def from_vertex_to_tensor(self, vertex):
+    def from_vertex_to_tensor(self, v):
+
+        # It is assumed that inputs dimension of all actions have been properly 
+        # checked during the mutation phase
+
+        v = Vertex()
+
+        """ D'abord vérifier qu'on a tous les tensors d'input disponibles, sinon return(None) """
+
+        # action -> batch normalization -> activation -> max-pooling -> dropout
+
+        # No action, sum or concatenation
+
+        """ Check séquentiel des attributs du Vertex """
 
         return (tensor)
     
-    def from_edge_to_tensor(self, edge):
+    def from_edge_to_tensor(self, e):
 
         return (tensor)
         
@@ -117,24 +132,39 @@ class NN:
                 # create tensor from vertex object
                 tensor = self.from_vertex_to_tensor(graph_object)
 
-                # add the resulting tensor in the vertices dictionary
-                self.vertices_tensor[graph_object.id] = tensor
+                # save tensor if it was successfully created
+                if tensor is not None:
+                    
+                    # add the resulting tensor in the vertices dictionary
+                    self.vertices_tensor[graph_object.id] = tensor
 
-                # push all outgoing edges to the queue
-                for edge_out in graph_object.edges_out:
-                    self.queue.append(edge_out)
+                    # push all outgoing edges to the queue
+                    for edge_out in graph_object.edges_out:
+                        self.queue.append(edge_out)
+                
+                else:
+                    # put vertex back in queue
+                    # more tensors have to be created before this one 
+                    self.queue.append(graph_object)
 
             else:
 
                 # create tensor from edge object
                 tensor = self.from_edge_to_tensor(graph_object)
 
-                # add the resulting tensor in the edges dictionary
-                self.edges_tensor[graph_object.id] = tensor
+                # save tensor if it was successfully created
+                if tensor is not None:
 
-                # push the destination vertex to the queue
-                self.queue.append(graph_object.to_vertex)
+                    # add the resulting tensor in the edges dictionary
+                    self.edges_tensor[graph_object.id] = tensor
 
+                    # push the destination vertex to the queue
+                    self.queue.append(graph_object.to_vertex)
+
+                else:
+                    # put edge back in queue
+                    # more tensors have to be created before this one 
+                    self.queue.append(graph_object)
 
 
         """

@@ -7,17 +7,33 @@
         "desc": "Representation of the ReLu activation function (Vertex)",
         "value": 1
     },
+    "NO_BATCH_NORMALIZATION": {
+        "desc": "Representation of not performing a batch normalization on the input edges (Vertex)",
+        "value": 0
+    },
+    "USE_BATCH_NORMALIZATION": {
+        "desc": "Representation of performing a batch normalization on the input edges (Vertex)",
+        "value": 1
+    },
+    "NO_MAX_POOLING": {
+        "desc": "Representation of not performing a max pooling on the input edges (Vertex)",
+        "value": 0
+    },
+    "USE_MAX_POOLING": {
+        "desc": "Representation of performing a max pooling on the input edges (Vertex)",
+        "value": 1
+    },
+    "NO_DROPOUT": {
+        "desc": "Representation of not performing a dropout normalization on the input edges (Vertex)",
+        "value": 0
+    },
+    "USE_DROPOUT": {
+        "desc": "Representation of performing a dropout normalization on the input edges (Vertex)",
+        "value": 1
+    },
     "NO_ACTION": {
         "desc": "Representation of not performing an action on the input edges (Vertex)",
         "value": 0
-    },
-    "NO_NORMALIZATION": {
-        "desc": "Representation of not performing a normalization on the input edges (Vertex)",
-        "value": 0
-    },
-    "DROPOUT": {
-        "desc": "Representation of performing a dropout normalization on the input edges (Vertex)",
-        "value": 1
     },
     "SUM": {
         "desc": "Representation of performing a sum of the input edges (Vertex)",

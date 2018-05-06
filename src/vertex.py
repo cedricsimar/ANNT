@@ -5,12 +5,18 @@ from exceptions import ImmutableException
 class Vertex:
 
     def __init__(self, id, mutable=[True, True, True], action=Settings.NO_ACTION,
-                 activation = Settings.LINEAR, normalization = Settings.NO_NORMALIZATION):
-
+                 batch_normalization = Settings.NO_BATCH_NORMALIZATION,
+                 activation=Settings.LINEAR, max_pooling=Settings.NO_MAX_POOLING,
+                 dropout = Settings.NO_DROPOUT):
+        
+        # layer -> action -> batch normalization -> activation -> max-pooling -> dropout 
         self.id = id
-        self.activation = activation
+
         self.action = action
-        self.normalization = normalization
+
+        self.batch_normalization = batch_normalization
+        self.activation = activation
+        self.dropout = dropout
 
         self.edges_in = []
         self.edges_out = []
