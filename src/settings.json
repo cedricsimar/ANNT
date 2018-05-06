@@ -11,6 +11,14 @@
         "desc": "Representation of not performing an action on the input edges (Vertex)",
         "value": 0
     },
+    "NO_NORMALIZATION": {
+        "desc": "Representation of not performing a normalization on the input edges (Vertex)",
+        "value": 0
+    },
+    "DROPOUT": {
+        "desc": "Representation of performing a dropout normalization on the input edges (Vertex)",
+        "value": 1
+    },
     "SUM": {
         "desc": "Representation of performing a sum of the input edges (Vertex)",
         "value": 1

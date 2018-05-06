@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from collections import deque
+
 from tf_decorator import *
 from settings import Settings
 
@@ -10,21 +12,40 @@ from tensorflow.python.ops.init_ops import glorot_uniform_initializer
 
 class NN:
 
-    def __init__(self, input_ph, labels_ph):
+    def __init__(self, dna):
 
         """
-        Simple CNN approach (no recurrence)
+        Neural Network build using a DNA object
         """
+
+        # DNA of the Neural Network
+        self.dna = dna
+
+        # Graph vertex root
+        self.root = self.dna.vertices[0]
+
+        # tensors created by edges and vertices from the DNA
+        self.vertices_tensor = {}
+        self.edges_tensor = {}
+
+        # network building queue
+        self.queue = deque([])
+
+        # retrieve input dimensionality
+        self.input_dim = len(self.dna.input_shape)
 
         # receiving input placeholder
-        self.input = input_ph
-        self.labels = labels_ph
+        if self.input_dim == 1:
+            # 1D input
+            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0]])
+        elif self.input_dim == 2:
+            # 2D input
+            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0], self.dna.input_shape[1]])
+
+        self.labels = tf.placeholder(tf.float32, [None, self.dna.output_shape])
 
         # Network settings
         self.norm_eps = Settings.NORMALIZATION_EPSILON
-
-        # getting the number of hand motions to classify
-        self.output_size = Settings.NUM_EVENTS
 
         # weights and biases dictionary
         self.learning_parameters = {}
@@ -52,16 +73,43 @@ class NN:
                 except AttributeError as e:
                     print(e)
 
+    def from_vertex_to_tensor(self, vertex):
+
+        return (tensor)
+    
+    def from_edge_to_tensor(self, edge):
+
+        return (tensor)
+        
 
     @define_scope
     def predict(self):
+
         """
-        The input to the neural network consists of a 32 channels x SAMPLE_LENGTH signal 
-        produced by the preprocessing stage
+        First handle the input vertex (root) to the neural network separately
+        because it doesn't have any incoming edges
         """
-        # reshape input to 3d tensor [batch, channels, sample length]
-        input_layer = tf.reshape(self.input,
-                                [-1, Settings.NUM_CHANNELS, Settings.SAMPLE_LENGTH, 1])
+        # reshape input to 4d tensor [batch, shape_x, shape_y, 1]
+        if self.input_dim == 1:
+            # 1D input
+            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], 1])
+        elif self.input_dim == 2:
+            # 2D input
+            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], 1])        
+
+        # push all outgoing edges to the queue
+        for edge_out in self.root.edges_out:
+            self.queue.append(edge_out)
+
+        # add the resulting tensor in a dictionary using the vertex id
+        self.vertices_tensor[0] = input_layer
+
+
+        """
+        Iteratively build the Neural Network layers following the DNA graph
+        """
+        while(len(self.queue) > 0):
+            print("Do something")
 
 
         """

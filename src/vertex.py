@@ -4,11 +4,13 @@ from exceptions import ImmutableException
 
 class Vertex:
 
-    def __init__(self, id, mutable = [True, True, True], action = Settings.NO_ACTION, activation = Settings.LINEAR):
+    def __init__(self, id, mutable=[True, True, True], action=Settings.NO_ACTION,
+                 activation = Settings.LINEAR, normalization = Settings.NO_NORMALIZATION):
 
         self.id = id
         self.activation = activation
         self.action = action
+        self.normalization = normalization
 
         self.edges_in = []
         self.edges_out = []
