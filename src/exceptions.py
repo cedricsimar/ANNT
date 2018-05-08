@@ -11,3 +11,10 @@ class ImmutableException(Exception):
     def __init__(self, message = "Impossible to change an immutable object"): # self.errors = errors for custom code
 
         super().__init__(message)
+
+
+class InvalidNumberOfEdges(Exception):
+
+    def __init__(self, message = "Invalid number of edges for the selected action"): # self.errors = errors for custom code
+
+        super().__init__(message)

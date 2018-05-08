@@ -4,37 +4,47 @@ from exceptions import UnknownLayerException
 
 class Edge:
 
-    def __init__(self, from_vertex, to_vertex, type = Settings.FULLY_CONNECTED, mutable = [True, True, True], units = None):
-
+    def __init__(self, edge_id, from_vertex, to_vertex, type = Settings.FULLY_CONNECTED, mutable = [True, True, True], units = None):
+        
+        self.id = edge_id
         self.from_vertex = from_vertex
         self.to_vertex = to_vertex
         self.type = type
 
+        self.units = None
+        self.kernels = None
+        self.kernel_shape = None
+        self.stride = None
+
         self.mutable_from, self.mutable_to, self.mutable_type = mutable
 
+        # initialize parameters depending on the layer type
         if self.type == Settings.FULLY_CONNECTED:
             
             if units == None:
-                self.units = Settings.DEFAULT_UNITS
+                self.set_default_fc()
             else:
-                # to initialize the output FC layer with output shape
+                # only used to initialize the output FC layer with output shape
                 self.units = units 
 
-            self.kernels = None
-            self.kernel_shape = None
-            self.stride = None
+        elif self.type == Settings.CONVOLUTIONAL:
 
-        elif self.type == Settings.CONVOLUTIONNAL:
-
-            self.kernels = Settings.DEFAULT_KERNELS
-            self.kernel_shape = Settings.DEFAULT_KERNEL_SHAPE
-            self.stride = Settings.DEFAULT_STRIDE
-            
-            self.units = None
+            self.set_default_conv()
         
+        elif self.type == Settings.IDENTITY:
+            pass
+
         else:
             raise UnknownLayerException()
 
     
     def is_vertex(self):
-        return(False)
+        return (False)
+        
+    def set_default_fc(self):
+        self.units = Settings.DEFAULT_UNITS
+
+    def set_default_conv(self):
+        self.kernels = Settings.DEFAULT_KERNELS
+        self.kernel_shape = Settings.DEFAULT_KERNEL_SHAPE
+        self.stride = Settings.DEFAULT_STRIDE

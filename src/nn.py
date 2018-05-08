@@ -4,6 +4,7 @@ from collections import deque
 
 from tf_decorator import *
 from settings import Settings
+from exceptions import InvalidNumberOfEdges
 
 import tensorflow as tf
 from tensorflow.python.ops import array_ops as tf_array_ops
@@ -80,19 +81,80 @@ class NN:
         # It is assumed that inputs dimension of all actions have been properly 
         # checked during the mutation phase
 
-        v = Vertex()
+        # First we check if all input edge tensors have already been created
+        for input_edge in v.edges_in:
+            if input_edge.id not in self.edges_tensor:
+                return(None)
 
-        """ D'abord vérifier qu'on a tous les tensors d'input disponibles, sinon return(None) """
-
+        # Check if the action type matches with the number of input edges
+        if (v.action == Settings.NO_ACTION and len(v.edges_in) > 1) or (v.action != Settings.NO_ACTION and len(v.edges_in) < 2):
+            raise InvalidNumberOfEdges()
+        
+        # sequentially check the vertex attributes and create the tensors accordingly
         # action -> batch normalization -> activation -> max-pooling -> dropout
 
         # No action, sum or concatenation
+        if v.action == Settings.NO_ACTION:
 
-        """ Check séquentiel des attributs du Vertex """
+            # ouput of "No action" if the input tensor
+            tensor = self.edges_tensor[v.edges_in[0].id]
+
+        else:
+            
+            # compute the list of input tensors
+            input_tensors = [self.edges_tensor[e.id] for e in v.edges_in]
+
+            # apply the action
+            if v.action == Settings.SUM:
+
+                tensor = input_tensors[0]
+                for i in range(1, len(input_tensors)):
+                    tensor = tf.add(tensor, input_tensors[i])
+            
+            elif v.action == Settings.CONCATENATION:
+
+                tensor = tf.concat(input_tensors, axis = 1)
+
+
+        # batch normalization
+        # TODO or not TODO
+
+        # activation / non-linearity
+        if v.activation == Settings.RELU:
+
+            tensor = tf.nn.relu(tensor)
+
+        # max pooling
+        if v.max_pooling == Settings.USE_MAX_POOLING:
+            tensor = tf.layers.max_pooling2d(inputs=tensor, pool_size=Settings.DEFAULT_POOLING_SHAPE, strides=Settings.DEFAULT_POOLING_STRIDE)
+        
+        # flatten
+        if v.flatten == Settings.FLATTEN:
+            tensor = tf.layers.flatten(tensor)
+
+        # dropout
+        if v.dropout == Settings.USE_DROPOUT:
+            tensor = tf.layers.dropout(inputs=tensor, rate=Settings.DROPOUT_RATE)
 
         return (tensor)
     
+
     def from_edge_to_tensor(self, e):
+
+        # First we check if the vertex tensor has already been created
+        if e.from_vertex not in self.vertices_tensor:
+            return (None)
+
+        tensor = self.vertices_tensor[e.from_vertex.id]
+        
+        if e.type == Settings.FULLY_CONNECTED:
+
+            tensor = tf.layers.dense(tensor, e.units, use_bias=True)
+
+        elif e.type == Settings.CONVOLUTIONAL:
+
+            tensor=tf.layers.conv2d(tensor, e.kernels, e.kernel_shape, e.stride, padding="same",
+                                    kernel_initializer = glorot_uniform_initializer())
 
         return (tensor)
         
@@ -165,78 +227,8 @@ class NN:
                     # put edge back in queue
                     # more tensors have to be created before this one 
                     self.queue.append(graph_object)
-
-
-        """
-        Layer 1: 1D spatial convolution over the channels to condense NUM_CHANNELS to
-                 the number of the convolutional filters (thus reducing the input dimenstion)
-                 Linear transformation, no activation function used
-        """
-        conv1 = tf.layers.conv2d(inputs=input_layer, filters=4, kernel_size=[Settings.NUM_CHANNELS, 1],
-                                 strides = (1, 1), padding="valid", kernel_initializer=glorot_uniform_initializer(),
-                                 activation=None)
-
-        print("conv1 shape: ", conv1.get_shape())
-                                 
-        """
-        Layer 2: 1D temporal convolution over the raw signal of each channel
-                 Activation function: ReLu
-                 Max pooling 
-        """
-        conv2 = tf.layers.conv2d(inputs=conv1, filters=32, kernel_size=[1, 9], strides=(1, 1),
-                                 padding = "same", kernel_initializer = glorot_uniform_initializer(),
-                                 activation = tf.nn.leaky_relu)
-
-        print("conv2 shape: ", conv2.get_shape())
-
-        pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=(1, 4), strides=(1, 4))
-        # no dropout in the first layer
-
-        print("pool2 shape: ", pool2.get_shape())
-
-        """
-        Layer 3: Second 1D temporal convolution
-                 Activation function: ReLu
-                 Max pooling
-                 Flatten the output of the max pooling layer to get the input of the FC layer
-                 Dropout layer with p = 0.5
-        """
-        conv3 = tf.layers.conv2d(inputs=pool2, filters=32, kernel_size=[1, 9], strides=(1, 1),
-                                 padding = "same", kernel_initializer = glorot_uniform_initializer(),
-                                 activation = tf.nn.leaky_relu)
         
-        pool3 = tf.layers.max_pooling2d(inputs=conv3, pool_size=(1, 4), strides=(1, 4))
-
-        flat3 = tf.layers.flatten(pool3)
-        
-        drop3 = tf.layers.dropout(inputs=flat3, rate=Settings.DROPOUT_RATE)
-        
-
-        print("drop3 shape: ", drop3.get_shape())
-
-        """
-        Layers 4 and 5: Standard Fully Connected layers separated by Dropout layers
-        """
-        fc4 = tf.layers.dense(inputs=drop3, units=1024, activation=tf.nn.relu, use_bias=True,
-                              kernel_initializer = glorot_uniform_initializer())
-        drop4 = tf.layers.dropout(inputs=fc4, rate=Settings.DROPOUT_RATE)
-
-        fc5 = tf.layers.dense(inputs=drop4, units=1024, activation=tf.nn.relu, use_bias=True,
-                              kernel_initializer = glorot_uniform_initializer())
-        drop5 = tf.layers.dropout(inputs=fc5, rate=Settings.DROPOUT_RATE)
-
-        
-        """
-        Layer 6: Output layer
-        """
-        logits = tf.layers.dense(inputs=drop5, units=Settings.NUM_EVENTS,
-                               kernel_initializer = glorot_uniform_initializer(),
-                               activation = None)
-
-        # using sigmoid cross entropy (not mutually exclusive) with logits so no need of an
-        # activation function at the end of the CNN
-        
-        return(logits)
+        return(tensor)
 
 
     @define_scope

@@ -61,7 +61,7 @@ class DNA:
         self.edges[self.edge_id] = Edge(self.vertices[0], self.vertices[1], units=self.output_shape)
         self.edge_id += 1
 
-        # force the link between input and output (switch on mutability temporarily)
+        # link the input and output (switch on mutability temporarily)
         # switch on mutability
         self.vertices[1].mutable_in = True
 
