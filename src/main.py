@@ -11,6 +11,7 @@ from ga import GeneticAlgorithm
 def main():
 
     GA = GeneticAlgorithm(10, 1)
+    GA.evolve(1)
 
 
 

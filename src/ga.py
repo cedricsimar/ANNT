@@ -28,10 +28,11 @@ class GeneticAlgorithm(object):
         # for each individual, create the corresponding neural network,
         # train it on the MNIST dataset and store it's fitness score
         
-        for individual in range(self.population):
+        for individual_dna in self.population:
 
             # create the corresponding neural network
-            nn = 
+            print(individual_dna)
+            nn = NN(individual_dna)
 
 
     def create_initial_population(self):

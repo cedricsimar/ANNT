@@ -37,7 +37,7 @@ class NN:
         # retrieve input dimensionality
         self.input_dim = len(self.dna.input_shape)
 
-        # receiving input placeholder
+        # creating input placeholder
         if self.input_dim == 1:
             # 1D input
             self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0]])
@@ -55,9 +55,13 @@ class NN:
         self.layers = {}
 
         # initialize tensorflow graph
-        self.predict
-        self.optimize
-        self.loss
+        with tf.Session() as sess:
+            self.predict
+            writer = tf.summary.FileWriter("./tmp/log", sess.graph)
+            self.optimize
+            self.loss
+            writer.close()
+        assert(0)
 
         # Initialize input placeholder to assign values to weights and biases
         with tf.variable_scope("input_assignment"):
@@ -75,6 +79,80 @@ class NN:
                         self.l_param_input[variable_name])
                 except AttributeError as e:
                     print(e)
+
+    
+
+    @define_scope
+    def predict(self):
+
+        """
+        First handle the input vertex (root) to the neural network separately
+        because it doesn't have any incoming edges
+        """
+        # reshape input to 4d tensor [batch, shape_x, shape_y, 1]
+        if self.input_dim == 1:
+            # 1D input
+            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], 1])
+        elif self.input_dim == 2:
+            # 2D input
+            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], 1])        
+
+        # push all outgoing edges to the queue
+        for edge_out in self.root.edges_out:
+            self.queue.append(edge_out)
+
+        # add the resulting tensor in a dictionary using the vertex id
+        self.vertices_tensor[0] = input_layer
+
+
+        """
+        Iteratively build the Neural Network layers following the DNA graph
+        """
+        while(len(self.queue) > 0):
+
+            graph_object = self.queue.popleft()
+            
+            if(graph_object.is_vertex()):
+
+                # create tensor from vertex object
+                tensor = self.from_vertex_to_tensor(graph_object)
+
+                # save tensor if it was successfully created
+                if tensor is not None:
+                    
+                    # add the resulting tensor in the vertices dictionary
+                    self.vertices_tensor[graph_object.id] = tensor
+
+                    # push all outgoing edges to the queue
+                    for edge_out in graph_object.edges_out:
+                        self.queue.append(edge_out)
+                
+                else:
+                    # put vertex back in queue
+                    # more tensors have to be created before this one 
+                    self.queue.append(graph_object)
+
+            else:
+                
+                # create tensor from edge object
+                tensor = self.from_edge_to_tensor(graph_object)
+                
+                # save tensor if it was successfully created
+                if tensor is not None:
+
+                    # add the resulting tensor in the edges dictionary
+                    self.edges_tensor[graph_object.id] = tensor
+
+                    # push the destination vertex to the queue
+                    self.queue.append(graph_object.to_vertex)
+
+                else:
+                    # put edge back in queue
+                    # more tensors have to be created before this one 
+                    self.queue.append(graph_object)
+        
+        return(tensor)
+
 
     def from_vertex_to_tensor(self, v):
 
@@ -142,7 +220,7 @@ class NN:
     def from_edge_to_tensor(self, e):
 
         # First we check if the vertex tensor has already been created
-        if e.from_vertex not in self.vertices_tensor:
+        if e.from_vertex.id not in self.vertices_tensor:
             return (None)
 
         tensor = self.vertices_tensor[e.from_vertex.id]
@@ -158,78 +236,6 @@ class NN:
 
         return (tensor)
         
-
-    @define_scope
-    def predict(self):
-
-        """
-        First handle the input vertex (root) to the neural network separately
-        because it doesn't have any incoming edges
-        """
-        # reshape input to 4d tensor [batch, shape_x, shape_y, 1]
-        if self.input_dim == 1:
-            # 1D input
-            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], 1])
-        elif self.input_dim == 2:
-            # 2D input
-            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], 1])        
-
-        # push all outgoing edges to the queue
-        for edge_out in self.root.edges_out:
-            self.queue.append(edge_out)
-
-        # add the resulting tensor in a dictionary using the vertex id
-        self.vertices_tensor[0] = input_layer
-
-
-        """
-        Iteratively build the Neural Network layers following the DNA graph
-        """
-        while(len(self.queue) > 0):
-            
-            graph_object = self.queue.popleft()
-
-            if(graph_object.is_vertex()):
-
-                # create tensor from vertex object
-                tensor = self.from_vertex_to_tensor(graph_object)
-
-                # save tensor if it was successfully created
-                if tensor is not None:
-                    
-                    # add the resulting tensor in the vertices dictionary
-                    self.vertices_tensor[graph_object.id] = tensor
-
-                    # push all outgoing edges to the queue
-                    for edge_out in graph_object.edges_out:
-                        self.queue.append(edge_out)
-                
-                else:
-                    # put vertex back in queue
-                    # more tensors have to be created before this one 
-                    self.queue.append(graph_object)
-
-            else:
-
-                # create tensor from edge object
-                tensor = self.from_edge_to_tensor(graph_object)
-
-                # save tensor if it was successfully created
-                if tensor is not None:
-
-                    # add the resulting tensor in the edges dictionary
-                    self.edges_tensor[graph_object.id] = tensor
-
-                    # push the destination vertex to the queue
-                    self.queue.append(graph_object.to_vertex)
-
-                else:
-                    # put edge back in queue
-                    # more tensors have to be created before this one 
-                    self.queue.append(graph_object)
-        
-        return(tensor)
-
 
     @define_scope
     def predict_proba(self):
