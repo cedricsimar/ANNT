@@ -26,6 +26,13 @@ class Vertex:
         self.mutable_in, self.mutable_out, self.mutable_properties = mutable
         
     
+    def change_action(self, new_action):
+        if self.mutable_properties:
+            self.action = new_action
+        else:
+            raise ImmutableException()
+
+
     def add_edge_in(self, edge):
         if self.mutable_in:
             self.edges_in.append(edge)

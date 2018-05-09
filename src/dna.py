@@ -76,7 +76,7 @@ class DNA:
         self.edges[self.edge_id] = Edge(self.edge_id, self.vertices[0], self.vertices[2], type=Settings.IDENTITY)
         self.edge_id += 1
 
-        # create fc edge between input and output with the number of units equal to the output shape
+        # create fc edge between the flatten vertex and output with the number of units equal to the output shape
         self.edges[self.edge_id] = Edge(self.edge_id, self.vertices[2], self.vertices[1], units=self.output_shape)
         self.edge_id += 1
 

@@ -2,19 +2,26 @@
 from settings import Settings
 
 from dna import DNA
+from mutation import Mutation
 from nn import NN
 
 class GeneticAlgorithm(object):
 
-    def __init__(self, population_size, mutation_rate):
-
+    def __init__(self, population_size, mutations_per_generation):
+        
+        self.generation = 0
         self.population_size = population_size
-        self.mutation_rate = mutation_rate
+        self.mutations_per_generation = mutations_per_generation
 
         self.population = []
         self.neural_networks = []
         self.fitness = []
         
+        self.best_fitness_score = 0
+        
+        # individuals that are "saved" and go through the next generation unchanged
+        self.best_individuals = []  
+
         self.create_initial_population()
 
 
@@ -23,16 +30,34 @@ class GeneticAlgorithm(object):
         """
         Evolve the population for a fixed number of generations
         """
-        print("Evolving")
 
-        # for each individual, create the corresponding neural network,
-        # train it on the MNIST dataset and store it's fitness score
-        
-        for individual_dna in self.population:
+        for gen in range(num_generations):
 
-            # create the corresponding neural network
-            print(individual_dna)
-            nn = NN(individual_dna)
+            self.generation += 1
+            print("Evolving generation " + str(self.generation))
+
+            # for each individual
+            #   - mutate and cross-over
+            #   - repair if necessary
+            #   - create the corresponding neural network,
+            #   - train it on the MNIST dataset and store it's fitness score
+            
+            for individual_i in range(len(self.population)):
+
+                # cross-over
+                
+                # mutate
+                mutant = Mutation(self.population[individual_i]).mutate()
+
+                # repair
+
+                # create the corresponding neural network
+                print(mutant)
+                nn = NN(mutant)
+
+                # update population and fitness score
+
+            # keep the best individuals in the next generation
 
 
     def create_initial_population(self):

@@ -1,4 +1,8 @@
 {
+    "MUTATION_PROBABILITY": {
+        "desc": "Probability that a mutation occurs during a mutation phase",
+        "value": 0.99
+    },
     "LINEAR": {
         "desc": "Representation of the linear activation function (Vertex)",
         "value": 0
@@ -59,6 +63,10 @@
         "desc": "Representation of performing a concatenation of the input edges (Vertex)",
         "value": 2
     },
+    "NUM_VERTEX_ACTIONS": {
+        "desc": "Number of possible vertex actions",
+        "value": 3
+    },
     "FULLY_CONNECTED": {
         "desc": "Representation of a fully connected layer (Edge)",
         "value": 0
@@ -70,6 +78,10 @@
     "IDENTITY": {
         "desc": "Representation of an identity layer (Edge)",
         "value": 2
+    },
+    "NUM_EDGE_TYPES": {
+        "desc": "Number of possible edge types",
+        "value": 3
     },
     "DEFAULT_UNITS": {
         "desc": "Default units for fully connected layers (Edge)",
