@@ -57,6 +57,12 @@ class Vertex:
         else:
             raise ImmutableException()
 
+    def num_edges_in(self):
+        return (len(self.edges_in))
+    
+    def num_edges_out(self):
+        return(len(self.edges_out))
+
     def is_vertex(self):
         return(True)
         
