@@ -419,14 +419,25 @@ class Mutation:
             return(has_mutated)
 
         selected_edge = choice(edges_mutable_prop)
-        new_type = choice([Settings.FULLY_CONNECTED, Settings.CONVOLUTIONAL, Settings.IDENTITY])
 
-        try:
-            selected_edge.set_type(new_type)
-        except ImmutableException:
-            print("Weird Immutable exception at flip_edge_attribute method")
-            return (has_mutated)
-        
+        # in this implementation, mutable properties are limited to 
+        #   - the dense units 
+        #   - number of kernels
+
+        if selected_edge.type == Settings.FULLY_CONNECTED:
+            try:
+                selected_edge.set_units(choice(Settings.ALLOWED_UNITS))
+            except ImmutableException:
+                print("Weird Immutable exception at flip_edge_attribute method")
+                return (has_mutated)
+
+        elif selected_edge.type == Settings.CONVOLUTIONAL:
+            try:
+                selected_edge.set_kernels(choice(Settings.ALLOWED_KERNELS))
+            except ImmutableException:
+                print("Weird Immutable exception at flip_edge_attribute method")
+                return (has_mutated)
+            
         # finally mutation can be marked as complete
         has_mutated = True
 
@@ -434,7 +445,42 @@ class Mutation:
         
 
     def flip_vertex_attribute(self):
+
         has_mutated = False
 
+        vertices_mutable_prop = self.list_of_vertices_mutable_prop()
+
+        # if the candidate list is empty the mutation cannot happen
+        if(not len(vertices_mutable_prop)):
+            print("No candidate vertex to flip attribute")
+            return(has_mutated)
+
+        selected_vertex = choice(vertices_mutable_prop)
+
+        # in this implementation, mutable properties are limited to 
+        #   - 0 action if there are several input edges
+        #   - 1 activation
+        #   - 2 max_pooling
+        #   - 3 dropout
+        #   - 4 flatten
+        
+        selected_property = randint(0, 4)
+
+        # please include native switch/case in Python, pretty please..
+        if selected_property == 0:
+            if(len(selected_vertex.edges_in) > 1):
+                selected_vertex.action = choice([Settings.SUM, Settings.CONCATENATION])
+        elif selected_property == 1:
+            selected_vertex.activation = choice([Settings.LINEAR, Settings.RELU])
+        elif selected_property == 2:
+            selected_vertex.max_pooling = choice([Settings.USE_MAX_POOLING, Settings.NO_MAX_POOLING])
+        elif selected_property == 3:
+            selected_vertex.dropout = choice([Settings.USE_DROPOUT, Settings.NO_DROPOUT])
+        elif selected_property == 4:
+            selected_vertex.flatten = choice([Settings.FLATTEN, Settings.NO_FLATTEN])
+
+        # finally mutation can be marked as complete
+        has_mutated = True
+        
         return (has_mutated)
         

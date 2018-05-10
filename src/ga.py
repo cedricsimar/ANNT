@@ -3,6 +3,7 @@ from settings import Settings
 
 from dna import DNA
 from mutation import Mutation
+from cross_over import Cross_Over
 from nn import NN
 
 class GeneticAlgorithm(object):
@@ -36,8 +37,10 @@ class GeneticAlgorithm(object):
             self.generation += 1
             print("Evolving generation " + str(self.generation))
 
+            # save the 3 best individuals
+
             # for each individual
-            #   - mutate and cross-over
+            #   - cross-over and mutate
             #   - repair if necessary
             #   - create the corresponding neural network,
             #   - train it on the MNIST dataset and store it's fitness score
@@ -45,6 +48,7 @@ class GeneticAlgorithm(object):
             for individual_i in range(len(self.population)):
 
                 # cross-over
+                # offspring_1, offspring_2 = Cross_Over()
                 
                 # mutate
                 mutant = Mutation(self.population[individual_i]).mutate()
@@ -55,7 +59,7 @@ class GeneticAlgorithm(object):
                 print(mutant)
                 nn = NN(mutant)
 
-                # update population and fitness score
+                # compute fitness score and update population
 
             # keep the best individuals in the next generation
 

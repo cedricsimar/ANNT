@@ -63,3 +63,19 @@ class Edge:
         
         else:
             raise ImmutableException()
+    
+
+    def set_units(self, new_units):
+
+        if(self.mutable_type):
+            self.units = new_units
+        else:
+            raise ImmutableException()
+    
+
+    def set_kernels(self, new_kernels):
+
+        if(self.mutable_type):
+            self.kernels = new_kernels
+        else:
+            raise ImmutableException()
