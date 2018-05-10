@@ -72,4 +72,7 @@ class GeneticAlgorithm(object):
         """
 
         for individual in range(self.population_size):
-            self.population.append(DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE))
+            
+            dna = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
+            dna.create_primitive_structure()
+            self.population.append(dna)
