@@ -1,5 +1,7 @@
 
 from random import random, choice, randint
+from copy import deepcopy
+
 from settings import Settings
 from edge import Edge
 from vertex import Vertex
@@ -113,16 +115,6 @@ class Mutation:
                 vertices_mutable_in.append(self.dna.vertices[vertex_id])
 
         return (vertices_mutable_in)
-
-
-    def list_of_vertices_mutable_prop(self):
-
-        vertices_mutable_prop = []
-        for vertex_id in self.dna.vertices:
-            if(self.dna.vertices[vertex_id].mutable_properties):
-                vertices_mutable_prop.append(self.dna.vertices[vertex_id])
-
-        return (vertices_mutable_prop)
         
 
     def remove_edge(self):
@@ -176,7 +168,7 @@ class Mutation:
 
         # create the new vertex (not include max pooling and flatten cause it can cause ill-formed nn)
         new_vertex = Vertex(self.dna.vertex_id,
-                            action=choice([Settings.LINEAR, Settings.RELU]),
+                            activation=choice([Settings.LINEAR, Settings.RELU]),
                             dropout=choice([Settings.NO_DROPOUT, Settings.USE_DROPOUT]))
 
         self.dna.vertices[self.dna.vertex_id] = new_vertex
@@ -251,8 +243,87 @@ class Mutation:
 
         vertex_to_remove = choice(removable_vertices)
 
-        # ...
+        # try to connect edges_in and the to_vertices as one-to-one correspondance
+        # if one-to-one correspondance is no longer possible, deal separately with the different scenari 
 
+        index_in = 0
+        index_out = 0
+        
+        while(index_in < len(vertex_to_remove.edges_in) and index_out < len(vertex_to_remove.edges_out)):
+
+            # create a one-to-one connection
+            e_out = vertex_to_remove.edges_out[index_out]
+            to_v = e_out.to_vertex
+            e_in = vertex_to_remove.edges_in[index_in]
+
+            try:
+                to_v.remove_edge_in(e_out)
+                e_in.to_vertex = to_v
+                to_v.add_edge_in(e_in)
+
+                # since we only replace an incoming edge by another one
+                # we don't need to check the action parameter of to_v
+            
+            except ImmutableException:
+                print("Weird Immutable exception while removing a vertex during one-to-one connection")
+                return (has_mutated)
+            
+            index_in += 1
+            index_out += 1
+        
+        # handle cases where the number of edges_in is different from the number of edges_out
+        if(index_in < len(vertex_to_remove.edges_in)):
+            
+            # number of edges_in > number of edges_out
+            # we connect the remaining edges_in to the last edge_out
+            while(index_in < len(vertex_to_remove.edges_in)):
+                
+                e_in = vertex_to_remove.edges_in[index_in]
+
+                try:
+                    e_in.to_vertex = to_v
+                    to_v.add_edge_in(e_in)
+                        
+                    if(len(to_v.edges_in) > 1 and to_v.action == Settings.NO_ACTION):
+                        new_action = randint(Settings.NO_ACTION + 1, Settings.NUM_VERTEX_ACTIONS - 1)
+                        try:
+                            to_v.change_action(new_action)
+
+                        except ImmutableException:
+                            print("ImmutableException while changing a vertex action (in while connecting the remaining edges_in to the last edge_out)")
+                            return(has_mutated)
+                
+                except ImmutableException:
+                    print("Weird Immutable exception while connecting the remaining edges_in to the last edge_out")
+                    return (has_mutated)
+                
+                index_in += 1
+
+        elif(index_out < len(vertex_to_remove.edges_out)):
+
+            # number of edges_out > number of edges_in
+            # we clone the last edge of the last input vertex and connect it to the next vertex
+            last_vertex_in = e_in.from_vertex
+
+            while(index_out < len(vertex_to_remove.edges_out)):
+
+                e_out = vertex_to_remove.edges_out[index_out]
+                to_v = e_out.to_vertex
+
+                new_edge = deepcopy(e_in)
+                new_edge.to_vertex = to_v
+
+                try:
+                    to_v.remove_edge_in(e_out)
+                    to_v.add_edge_in(new_edge)
+                    last_vertex_in.add_edge_out(new_edge)
+                
+                except ImmutableException:
+                    print("Weird Immutable exception while connecting the last vertex to one to_vertex")
+                    return (has_mutated)
+                
+                index_out += 1
+            
 
         # finally mutation can be marked as complete
         has_mutated = True
@@ -268,8 +339,8 @@ class Mutation:
 
             v = self.dna.vertices[vertex_id]
 
-            # if the vertex has at least one edge_out
-            if len(v.edges_out) > 0:
+            # if the vertex has at least one edge_out and it's not the root vertex (index 0)
+            if len(v.edges_out) > 0 and vertex_id:
 
                 # add the vertex to the list if all edges_out are connected to vertices
                 # that are all mutable_in (otherwise the subsequent reconnection couldn't occur)
@@ -290,14 +361,74 @@ class Mutation:
     ######################
     # functional mutations
 
+    def list_of_vertices_mutable_prop(self):
+
+        vertices_mutable_prop = []
+        for vertex_id in self.dna.vertices:
+            if(self.dna.vertices[vertex_id].mutable_properties):
+                vertices_mutable_prop.append(self.dna.vertices[vertex_id])
+
+        return (vertices_mutable_prop)
+    
+
+    def list_of_edges_mutable_prop(self):
+
+        edges_mutable_prop = []
+        for edge_id in self.dna.edges:
+            if(self.dna.edges[edge_id].mutable_type):
+                edges_mutable_prop.append(self.dna.edges[edge_id])
+
+        return (edges_mutable_prop)
+
+
     def flip_edge_type(self):
+        
         has_mutated = False
+
+        edges_mutable_prop = self.list_of_edges_mutable_prop()
+
+        # if the candidate list is empty the mutation cannot happen
+        if(not len(edges_mutable_prop)):
+            print("No candidate edge to flip type")
+            return(has_mutated)
+
+        selected_edge = choice(edges_mutable_prop)
+        new_type = choice([Settings.FULLY_CONNECTED, Settings.CONVOLUTIONAL, Settings.IDENTITY])
+
+        try:
+            selected_edge.set_type(new_type)
+        except ImmutableException:
+            print("Weird Immutable exception at flip_edge_type method")
+            return (has_mutated)
+        
+        # finally mutation can be marked as complete
+        has_mutated = True
 
         return (has_mutated)
         
 
     def flip_edge_attribute(self):
+        
         has_mutated = False
+
+        edges_mutable_prop = self.list_of_edges_mutable_prop()
+
+        # if the candidate list is empty the mutation cannot happen
+        if(not len(edges_mutable_prop)):
+            print("No candidate edge to flip attribute")
+            return(has_mutated)
+
+        selected_edge = choice(edges_mutable_prop)
+        new_type = choice([Settings.FULLY_CONNECTED, Settings.CONVOLUTIONAL, Settings.IDENTITY])
+
+        try:
+            selected_edge.set_type(new_type)
+        except ImmutableException:
+            print("Weird Immutable exception at flip_edge_attribute method")
+            return (has_mutated)
+        
+        # finally mutation can be marked as complete
+        has_mutated = True
 
         return (has_mutated)
         

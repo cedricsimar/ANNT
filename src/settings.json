@@ -85,18 +85,26 @@
     },
     "DEFAULT_UNITS": {
         "desc": "Default units for fully connected layers (Edge)",
-        "value": 128
+        "value": 64
+    },
+    "ALLOWED_UNITS": {
+        "desc": "Allowed units for fully connected layers (Edge)",
+        "value": [64, 128, 256, 512]
     },
     "DEFAULT_KERNELS": {
-        "desc": "Default kernels for convolutionnal layers (Edge)",
-        "value": 16
+        "desc": "Default kernels for convolutional layers (Edge)",
+        "value": 8
+    },
+    "ALLOWED_KERNELS": {
+        "desc": "Allowed kernels for convolutional layers (Edge)",
+        "value": [8, 16, 32]
     },
     "DEFAULT_KERNEL_SHAPE": {
-        "desc": "Default kernel shape for convolutionnal layers (Edge)",
+        "desc": "Default kernel shape for convolutional layers (Edge)",
         "value": [3, 3]
     },
     "DEFAULT_STRIDE": {
-        "desc": "Default stride for convolutionnal layers (Edge)",
+        "desc": "Default stride for convolutional layers (Edge)",
         "value": [1, 1]
     },
     "INPUT_SHAPE": {

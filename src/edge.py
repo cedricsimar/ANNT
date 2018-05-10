@@ -1,6 +1,6 @@
 
 from settings import Settings
-from exceptions import UnknownLayerException
+from exceptions import UnknownLayerException, ImmutableException
 
 class Edge:
 
@@ -48,3 +48,18 @@ class Edge:
         self.kernels = Settings.DEFAULT_KERNELS
         self.kernel_shape = Settings.DEFAULT_KERNEL_SHAPE
         self.stride = Settings.DEFAULT_STRIDE
+    
+    def set_type(self, new_type):
+
+        if(self.mutable_type):
+            
+            if(self.type != new_type):
+
+                self.type = new_type
+                if self.type == Settings.FULLY_CONNECTED:
+                    self.set_default_fc()
+                elif self.type == Settings.CONVOLUTIONAL:
+                    self.set_default_conv()
+        
+        else:
+            raise ImmutableException()
