@@ -21,6 +21,9 @@ class NN:
         Neural Network build using a DNA object
         """
 
+        # Tensorflow graph
+        self.graph = tf.Graph()
+
         # DNA of the Neural Network
         self.dna = dna
 
@@ -55,30 +58,30 @@ class NN:
         self.layers = {}
 
         # initialize tensorflow graph
-        with tf.Session() as sess:
+        with self.graph.as_default():
+
             self.predict
-            writer = tf.summary.FileWriter("./tmp/log", sess.graph)
+            self.prediction_error
             self.optimize
             self.loss
-            writer.close()
-        assert(0)
+            
 
-        # Initialize input placeholder to assign values to weights and biases
-        with tf.variable_scope("input_assignment"):
+        # # Initialize input placeholder to assign values to weights and biases
+        # with tf.variable_scope("input_assignment"):
 
-            self.l_param_input = {}
-            self.assign_operator = {}
-            for variable_name in self.learning_parameters.keys():
-                self.l_param_input[variable_name] = tf.placeholder(
-                    tf.float32,
-                    self.learning_parameters[variable_name].get_shape().as_list(),
-                    name=variable_name)
+        #     self.l_param_input = {}
+        #     self.assign_operator = {}
+        #     for variable_name in self.learning_parameters.keys():
+        #         self.l_param_input[variable_name] = tf.placeholder(
+        #             tf.float32,
+        #             self.learning_parameters[variable_name].get_shape().as_list(),
+        #             name=variable_name)
 
-                try:  # If mutable tensor (Variable)
-                    self.assign_operator[variable_name] = self.learning_parameters[variable_name].assign(
-                        self.l_param_input[variable_name])
-                except AttributeError as e:
-                    print(e)
+        #         try:  # If mutable tensor (Variable)
+        #             self.assign_operator[variable_name] = self.learning_parameters[variable_name].assign(
+        #                 self.l_param_input[variable_name])
+        #         except AttributeError as e:
+        #             print(e)
 
     
 
@@ -237,15 +240,28 @@ class NN:
         return (tensor)
         
 
-    @define_scope
-    def predict_proba(self):
-        return(tf.sigmoid(self.predict))
+    # @define_scope
+    # def predict_proba(self):
+    #     return(tf.sigmoid(self.predict))
     
     @define_scope
-    def accuracy(self):
-        self.predictions = tf.round(self.predict_proba)
-        self.correct_predictions = tf.cast(tf.equal(self.predictions, self.labels), tf.float32)
-        return(tf.reduce_mean(self.correct_predictions))
+    def prediction_error(self):
+
+        """ Return the mean prediction error """
+
+        prediction_errors = tf.not_equal(tf.argmax(self.predict, 1), tf.argmax(self.labels, 1))
+        return (tf.reduce_mean(tf.cast(prediction_errors, tf.float32)))
+
+
+    @define_scope
+    def loss(self):
+
+        """ Return the mean loss """
+
+        self.batch_loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.labels, logits=self.predict)
+        self.mean_loss = tf.reduce_mean(self.batch_loss, name="mean_loss")
+        return (self.mean_loss)
+        
 
     @define_scope
     def optimize(self):
@@ -258,14 +274,9 @@ class NN:
         return(self.optimizer.minimize(self.loss))
 
 
-    @define_scope
-    def loss(self):
-        """ Return the mean error """
-
-        self.error = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.labels, logits=self.predict)
-        self.mean_error = tf.reduce_mean(self.error, name="mean_error")
-        return(self.mean_error)
-
+    def get_graph(self):
+        return(self.graph)
+    
     
     def get_value(self, var_name, tf_session):
         """
