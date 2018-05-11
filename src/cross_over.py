@@ -1,5 +1,6 @@
 
 from dna import DNA
+from exceptions import NoBridgeException
 
 from collections import deque
 from random import choice
@@ -18,6 +19,9 @@ class Cross_Over:
         # compute all the bridges of the parents
         parent_1_bridges = self.bridges(self.parent_1)
         parent_2_bridges = self.bridges(self.parent_2)
+
+        if(len(parent_1_bridges) < 1 or len(parent_2_bridges) < 1):
+            raise NoBridgeException()
 
         # choose one bridge per parent for the cross-over operation
         bridge_1_v_id = choice(parent_1_bridges)

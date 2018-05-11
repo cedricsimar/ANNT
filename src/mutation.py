@@ -12,7 +12,7 @@ class Mutation:
 
     def __init__(self, dna):
 
-        self.dna = dna
+        self.dna = deepcopy(dna)
         self.mutations={0: self.add_edge, 1: self.remove_edge, 2: self.add_vertex, 3: self.remove_vertex,
                         4: self.flip_edge_type, 5: self.flip_vertex_attribute, 6: self.flip_edge_attribute}
 
@@ -23,6 +23,7 @@ class Mutation:
 
         # mutate the dna 
         # for _ in range(self.mutations_per_generation):
+        has_mutated = True
 
         if random() <= Settings.MUTATION_PROBABILITY:
 
@@ -47,7 +48,8 @@ class Mutation:
     # structural mutations
 
     def add_edge(self):
-
+        
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
 
         # compute the list of vertices with mutable edge_in and edge_out 
@@ -75,6 +77,7 @@ class Mutation:
 
         except ImmutableException:
             print("Weird ImmutableException")
+            self.dna = saved_dna
             return(has_mutated)
 
 
@@ -89,6 +92,7 @@ class Mutation:
 
             except ImmutableException:
                 print("ImmutableException while changing a vertex action")
+                self.dna = saved_dna
                 return(has_mutated)
 
         # finally mutation can be marked as complete
@@ -118,7 +122,8 @@ class Mutation:
         
 
     def remove_edge(self):
-
+        
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
 
         # compute the list of removable edges
@@ -138,6 +143,7 @@ class Mutation:
         
         except ImmutableException:
                 print("Weird ImmutableException during remove_edge")
+                self.dna = saved_dna
                 return(has_mutated)
 
         # finally mutation can be marked as complete
@@ -164,6 +170,7 @@ class Mutation:
     def add_vertex(self):
 
         # add a vertex after an edge and connect it to the next vertex with an identity edge
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
 
         # create the new vertex (not include max pooling and flatten cause it can cause ill-formed nn)
@@ -180,6 +187,7 @@ class Mutation:
         # if the candidate list is empty the mutation cannot happen
         if(not len(edges_mutable_to)):
             print("No candidate edge to add a vertex to")
+            self.dna = saved_dna
             return (has_mutated)
     
         selected_edge = choice(edges_mutable_to)
@@ -198,6 +206,7 @@ class Mutation:
 
         except ImmutableException:
             print("Weird Immutable exception while connecting identity edge")
+            self.dna = saved_dna
             return(has_mutated)
 
         # cut the connection between the selected edge and the to_vertex and connect the edge
@@ -209,6 +218,7 @@ class Mutation:
 
         except ImmutableException:
             print("Weird Immutable exception while grafting the new vertex to the selected edge")
+            self.dna = saved_dna
             return(has_mutated)
         
         # finally mutation can be marked as complete
@@ -231,6 +241,7 @@ class Mutation:
 
     def remove_vertex(self):
         
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
         
         # compute the list of removable vertices
@@ -266,6 +277,7 @@ class Mutation:
             
             except ImmutableException:
                 print("Weird Immutable exception while removing a vertex during one-to-one connection")
+                self.dna = saved_dna
                 return (has_mutated)
             
             index_in += 1
@@ -291,10 +303,12 @@ class Mutation:
 
                         except ImmutableException:
                             print("ImmutableException while changing a vertex action (in while connecting the remaining edges_in to the last edge_out)")
+                            self.dna = saved_dna
                             return(has_mutated)
                 
                 except ImmutableException:
                     print("Weird Immutable exception while connecting the remaining edges_in to the last edge_out")
+                    self.dna = saved_dna
                     return (has_mutated)
                 
                 index_in += 1
@@ -320,6 +334,7 @@ class Mutation:
                 
                 except ImmutableException:
                     print("Weird Immutable exception while connecting the last vertex to one to_vertex")
+                    self.dna = saved_dna
                     return (has_mutated)
                 
                 index_out += 1
@@ -383,6 +398,7 @@ class Mutation:
 
     def flip_edge_type(self):
         
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
 
         edges_mutable_prop = self.list_of_edges_mutable_prop()
@@ -399,6 +415,7 @@ class Mutation:
             selected_edge.set_type(new_type)
         except ImmutableException:
             print("Weird Immutable exception at flip_edge_type method")
+            self.dna = saved_dna
             return (has_mutated)
         
         # finally mutation can be marked as complete
@@ -409,6 +426,7 @@ class Mutation:
 
     def flip_edge_attribute(self):
         
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
 
         edges_mutable_prop = self.list_of_edges_mutable_prop()
@@ -429,6 +447,7 @@ class Mutation:
                 selected_edge.set_units(choice(Settings.ALLOWED_UNITS))
             except ImmutableException:
                 print("Weird Immutable exception at flip_edge_attribute method")
+                self.dna = saved_dna
                 return (has_mutated)
 
         elif selected_edge.type == Settings.CONVOLUTIONAL:
@@ -436,6 +455,7 @@ class Mutation:
                 selected_edge.set_kernels(choice(Settings.ALLOWED_KERNELS))
             except ImmutableException:
                 print("Weird Immutable exception at flip_edge_attribute method")
+                self.dna = saved_dna
                 return (has_mutated)
             
         # finally mutation can be marked as complete
@@ -446,6 +466,7 @@ class Mutation:
 
     def flip_vertex_attribute(self):
 
+        saved_dna = deepcopy(self.dna)
         has_mutated = False
 
         vertices_mutable_prop = self.list_of_vertices_mutable_prop()

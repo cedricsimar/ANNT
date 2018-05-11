@@ -1,5 +1,7 @@
 
 from settings import Settings
+from exceptions import NoBridgeException
+from random import randint
 
 from dna import DNA
 from mutation import Mutation
@@ -45,54 +47,123 @@ class GeneticAlgorithm(object):
             self.next_generation_nn = []
             self.next_generation_fitness = []
 
-            # save the best individuals that go through the next generation unchanged
+            # save the three best individuals that go through the next generation unchanged
+            # (produces 3 offsprings)
+            for best_i in range(Settings.N_BEST_CANDIDATES):
 
-            # for each individual
-            #   - cross-over and mutate
-            #   - repair if necessary
-            #   - create the corresponding neural network,
-            #   - train it on the MNIST dataset and store it's best fitness score
-            #   - apply natural selection in the population
+                self.next_generation_dna.append(self.population[best_i])
+                self.next_generation_nn.append(self.neural_networks[best_i])
+                self.next_generation_fitness.append(self.fitness[best_i])
+
+            # breed the three best individuals together
+            # (produces at most 6 offsprings)
+            for best_i in range(Settings.N_BEST_CANDIDATES):
+                for best_j in range(best_i + 1, Settings.N_BEST_CANDIDATES):
+                    self.attempt_breeding(best_i, best_j)
             
-            for individual_i in range(len(self.population)):
+            # breed each best individual with a random individual from the population
+            # (produces at most 6 offsprings)
+            for best_i in range(Settings.N_BEST_CANDIDATES):
+                other_i = randint(0, self.population_size - 1)
+                self.attempt_breeding(best_i, other_i)
 
-                # cross-over
-                # offspring_1, offspring_2 = Cross_Over()
-                
-                # mutation
-                mutant = Mutation(self.population[individual_i]).mutate()
-                self.next_generation_dna.append(mutant)
-                print(mutant)
-
-                # create the corresponding neural network
-                nn = NN(mutant)
-                self.next_generation_nn.append(nn)
-
-                # train the neural network
-                best_validation_error = 1
-                sess = tf.Session(graph=nn.get_graph())
-                sess.run(tf.global_variables_initializer())
-
-                for training_step in range(Settings.TRAINING_STEPS):
-                    
-                    # training step
-                    images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
-                    sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
-
-                    # performance evaluation every x steps
-                    if not training_step % Settings.EVALUATION_RATE:
-                        validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels = self.validation_labels})
-                        print('Test error {:6.2f}%'.format(100 * validation_error))
-                        best_validation_error = min(best_validation_error, validation_error)
+            # breed random individuals together until the number of offsprings reaches 
+            # the maximum population size
+            while(len(self.next_generation_dna) < self.population_size):
+                other_i = randint(0, self.population_size - 1)
+                other_j = randint(0, self.population_size - 1)
+                self.attempt_breeding(other_i, other_j)
 
 
-                # compute fitness score and update population
+            # train every non-trained neural network of the next generation
+            # on the MNIST dataset and store it's best fitness score
 
-                # save graph logs
-                writer = tf.summary.FileWriter("./tmp/log", sess.graph)
-                writer.close()
+            for individual_i in range(Settings.N_BEST_CANDIDATES, self.population_size):
 
-            # keep the best individuals in the next generation
+                # train the neural network and store the individual's fitness score
+                individual_fitness = self.train_network(self.next_generation_nn[individual_i])
+                self.next_generation_fitness[individual_i] = individual_fitness
+            
+            # sort the next generation individuals by fitness
+            self.next_generation_fitness, self.next_generation_dna, self.next_generation_nn = (list(t) for t in zip(*sorted(zip(self.next_generation_fitness, self.next_generation_dna, self.next_generation_nn))))
+
+            # update the population for the next generation
+            self.population = self.next_generation_dna
+            self.neural_networks = self.next_generation_nn
+            self.fitness = self.next_generation_fitness
+
+
+            # # save graph logs
+            # writer = tf.summary.FileWriter("./tmp/log", sess.graph)
+            # writer.close()
+
+
+    def attempt_breeding(self, individual_i, individual_j):
+
+        """
+        Attempt to breed the two individuals (several times if necessary)
+        If the breeding is successful and the Neural Networks can be built,
+        the two offsprings are added into the next generation
+
+        The breeding process is the following:
+            - cross-over between the two lovers
+            - mutate the offsprings with probability p
+            - create the offsprings neural networks
+
+        """
+
+        breed_sucessful = False
+        breeding_attempts = 0
+        while(not breed_sucessful and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
+            
+            offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
+            
+            if(offspring_1 is not None and offspring_2 is not None):
+                mutated_offspring_1 = Mutation(offspring_1).mutate()
+                mutated_offspring_2 = Mutation(offspring_2).mutate()
+
+                try:
+                    mutated_offspring_1_nn = NN(mutated_offspring_1)
+                    mutated_offspring_2_nn = NN(mutated_offspring_2)
+                    breed_sucessful = True
+                except Exception as e:
+                    print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
+            else:
+                print("Failed to cross-over the individuals")
+            
+            breeding_attempts += 1
+        
+        if breed_sucessful:
+            self.next_generation_dna.append(mutated_offspring_1)
+            self.next_generation_dna.append(mutated_offspring_2)
+            self.next_generation_nn.append(mutated_offspring_1_nn)
+            self.next_generation_nn.append(mutated_offspring_2_nn)
+
+
+    def train_network(self, nn):
+
+        """
+        Train the Neural Network for a fixed number of steps and regularly evaluate
+        its performances 
+        """
+
+        best_validation_error = 1
+        sess = tf.Session(graph=nn.get_graph())
+        sess.run(tf.global_variables_initializer())
+
+        for training_step in range(Settings.TRAINING_STEPS):
+            
+            # training step
+            images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
+            sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
+
+            # performance evaluation every few training steps
+            if not training_step % Settings.EVALUATION_RATE:
+                validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels = self.validation_labels})
+                print('Test error {:6.2f}%'.format(100 * validation_error))
+                best_validation_error = min(best_validation_error, validation_error)
+        
+        return(best_validation_error)
 
 
     def create_initial_population(self):
