@@ -16,13 +16,27 @@ class DNA:
         self.output_shape = output_shape
         self.multiclass = multiclass
 
-        self.vertex_id = 0
-        self.edge_id = 0
+        self.input_vertex_id = None
+        self.output_vertex_id = None
 
         self.vertices = {}
         self.edges = {}
 
         self.num_fully_connected_layers = 0 # limit to 2 FC to limit computation time
+
+    
+    def add_vertex(self, v):
+
+        if(v.id not in self.vertices):
+            self.vertices[v.id] = v
+            
+
+    
+    def add_edge(self, e):
+
+        if(e.id not in self.edges):
+            self.edges[e.id] = e
+            
     
 
     def __str__(self):
@@ -58,25 +72,27 @@ class DNA:
         # input vertex = 0, output vertex = 1, flatten vertex = 2 
         # identity edge = 0, dense edge = 1
     
-        # create input vertex
-        self.vertices[self.vertex_id] = Vertex(self.vertex_id, mutable=[False, True, False])
-        self.vertex_id += 1
+        # create input vertex  
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, True, False])
+        self.input_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
 
         # create output vertex
-        self.vertices[self.vertex_id] = Vertex(self.vertex_id, mutable=[False, False, False])
-        self.vertex_id += 1
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, False, False])
+        self.output_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
 
         # create flatten vertex
-        self.vertices[self.vertex_id] = Vertex(self.vertex_id, mutable=[True, True, True], flatten=Settings.FLATTEN)
-        self.vertex_id += 1
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[True, True, True], flatten=Settings.FLATTEN)
+        Settings.GLOBAL_VERTEX_ID += 1
 
         # create an identity edge to connect the input with the flatten vertex
-        self.edges[self.edge_id] = Edge(self.edge_id, self.vertices[0], self.vertices[2], type=Settings.IDENTITY)
-        self.edge_id += 1
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[0], self.vertices[2], type=Settings.IDENTITY)
+        Settings.GLOBAL_EDGE_ID += 1
 
         # create fc edge between the flatten vertex and output with the number of units equal to the output shape
-        self.edges[self.edge_id] = Edge(self.edge_id, self.vertices[2], self.vertices[1], units=self.output_shape)
-        self.edge_id += 1
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[2], self.vertices[1], units=self.output_shape)
+        Settings.GLOBAL_EDGE_ID += 1
 
         # link the input and output (switch on mutability temporarily)
         # switch on mutability

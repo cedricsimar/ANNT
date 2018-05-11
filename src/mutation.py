@@ -65,8 +65,8 @@ class Mutation:
 
         # create an edge with a random type which connects the two selected vertices
         edge_type = randint(0, Settings.NUM_EDGE_TYPES - 1)
-        new_edge = Edge(self.dna.edge_id, from_v, to_v, type=edge_type)
-        self.dna.edge_id += 1
+        new_edge = Edge(Settings.GLOBAL_EDGE_ID, from_v, to_v, type=edge_type)
+        Settings.GLOBAL_EDGE_ID += 1
 
         # update the selected vertices
         try:
@@ -167,12 +167,12 @@ class Mutation:
         has_mutated = False
 
         # create the new vertex (not include max pooling and flatten cause it can cause ill-formed nn)
-        new_vertex = Vertex(self.dna.vertex_id,
+        new_vertex = Vertex(Settings.GLOBAL_VERTEX_ID,
                             activation=choice([Settings.LINEAR, Settings.RELU]),
                             dropout=choice([Settings.NO_DROPOUT, Settings.USE_DROPOUT]))
 
-        self.dna.vertices[self.dna.vertex_id] = new_vertex
-        self.dna.vertex_id += 1
+        self.dna.vertices[Settings.GLOBAL_VERTEX_ID] = new_vertex
+        Settings.GLOBAL_VERTEX_ID += 1
 
         # select possible edges and choose a candidate 
         edges_mutable_to = self.list_of_edges_mutable_to()
@@ -187,11 +187,11 @@ class Mutation:
         # graft the vertex and identity edge in the network
 
         # create the new identity edge between new vertex and the to_vertex of the selected edge
-        new_identity_edge = Edge(self.dna.edge_id, new_vertex,
+        new_identity_edge = Edge(Settings.GLOBAL_EDGE_ID, new_vertex,
                                  selected_edge.to_vertex, type=Settings.IDENTITY)
 
-        self.dna.edges[self.dna.edge_id] = new_identity_edge
-        self.dna.edge_id += 1
+        self.dna.edges[Settings.GLOBAL_EDGE_ID] = new_identity_edge
+        Settings.GLOBAL_EDGE_ID += 1
 
         try:
             selected_edge.to_vertex.add_edge_in(new_identity_edge)
@@ -481,6 +481,6 @@ class Mutation:
 
         # finally mutation can be marked as complete
         has_mutated = True
-        
+
         return (has_mutated)
         

@@ -1,4 +1,12 @@
 {
+    "GLOBAL_VERTEX_ID": {
+        "desc": "Global vertex ID",
+        "value": 0
+    },
+    "GLOBAL_EDGE_ID": {
+        "desc": "Global edge ID",
+        "value": 0
+    },
     "MUTATION_PROBABILITY": {
         "desc": "Probability that a mutation occurs during a mutation phase",
         "value": 0.99
