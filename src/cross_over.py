@@ -39,8 +39,8 @@ class Cross_Over:
         parents_fusion = DNA()
         parents_fusion.vertices.update(deepcopy(self.parent_1.vertices))
         parents_fusion.vertices.update(deepcopy(self.parent_2.vertices))
-        parents_fusion.edges.update(deepcopy(self.parent_1.edges)
-        parents_fusion.edges.update(deepcopy(self.parent_2.edges)
+        parents_fusion.edges.update(deepcopy(self.parent_1.edges))
+        parents_fusion.edges.update(deepcopy(self.parent_2.edges))
 
         # swap the edges_out of the two bridges
         swap_tmp = parents_fusion.vertices[bridge_1_v_id].edges_out

@@ -159,7 +159,7 @@ class GeneticAlgorithm(object):
 
             # performance evaluation every few training steps
             if not training_step % Settings.EVALUATION_RATE:
-                validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels = self.validation_labels})
+                validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels: self.validation_labels})
                 print('Test error {:6.2f}%'.format(100 * validation_error))
                 best_validation_error = min(best_validation_error, validation_error)
         

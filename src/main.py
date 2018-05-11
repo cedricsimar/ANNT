@@ -6,11 +6,9 @@ Settings.load("./settings.json")
 
 from ga import GeneticAlgorithm
 
-# add max pooling, dropout, batch normalization
-
 def main():
 
-    GA = GeneticAlgorithm(10, 1)
+    GA = GeneticAlgorithm(20, 1)
     GA.evolve(1)
 
 
