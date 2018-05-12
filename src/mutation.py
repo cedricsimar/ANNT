@@ -1,6 +1,7 @@
 
 from random import random, choice, randint
 from copy import deepcopy
+from collections import deque
 
 from settings import Settings
 from edge import Edge
@@ -65,6 +66,11 @@ class Mutation:
         from_v = choice(vertices_mutable_out)
         to_v = choice(vertices_mutable_in)
 
+        # the new edge should not create a cycle in the graph (between to_v and from_v)
+        if(self.has_cycle(from_v, to_v)):
+            print("The newly added edge created a cycle in the Neural Network graph")
+            return(has_mutated)
+
         # create an edge with a random type which connects the two selected vertices
         edge_type = randint(0, Settings.NUM_EDGE_TYPES - 1)
         new_edge = Edge(Settings.GLOBAL_EDGE_ID, from_v, to_v, type=edge_type)
@@ -101,6 +107,31 @@ class Mutation:
         return (has_mutated)
     
 
+    def has_cycle(self, from_v, to_v):
+        
+        """
+        Check if the newly added edge created a cycle in the Neural Network graph
+        """
+        is_cycle = False
+
+        # create vertex queue 
+        vertex_q = deque([])
+        vertex_q.append(to_v)
+
+        # walk the graph until the output vertex or from_v (in case of a cycle)
+        while(len(vertex_q) > 0 and not is_cycle):
+
+            current_vertex = vertex_q.popleft()
+
+            if(current_vertex.id == from_v.id):
+                is_cycle = True
+            else:
+                for e_out in current_vertex.edges_out:
+                    vertex_q.append(e_out.to_vertex)
+
+        return(is_cycle)
+    
+    
     def list_of_vertices_mutable_out(self):
 
         vertices_mutable_out = []
