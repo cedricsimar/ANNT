@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# tf_decorator.py
-# author : Robin Petit, Stanislas Gueniffey, Cedric Simar, Antoine Passemiers
 
 import functools
 import tensorflow as tf
