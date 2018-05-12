@@ -175,9 +175,10 @@ class GeneticAlgorithm(object):
                     print('Test error {:6.2f}%'.format(100 * validation_error))
                     best_validation_error = min(best_validation_error, validation_error)
 
-            # # save graph logs
-            writer = tf.summary.FileWriter("./tmp/log", sess.graph)
-            # writer.close()
+            # save graph logs
+            log_path = "./tmp/log/" + self.generation + "/" + "{:7.5}".format(best_validation_error).strip()
+            writer = tf.summary.FileWriter(log_path, sess.graph)
+            writer.close()
 
         return(best_validation_error)
 
