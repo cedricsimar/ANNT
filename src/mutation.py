@@ -177,6 +177,9 @@ class Mutation:
                 self.dna = saved_dna
                 return(has_mutated)
 
+        # remove the edge from the edges dictionary
+        self.dna.remove_edge(edge_to_remove)
+
         # finally mutation can be marked as complete
         has_mutated = True
 
@@ -192,7 +195,10 @@ class Mutation:
 
         removable_edges = []
         for edge_id in self.dna.edges:
-            if(self.dna.edges[edge_id].from_vertex.num_edges_out() > 1 and self.dna.edges[edge_id].to_vertex.num_edges_in() > 1):
+            if(self.dna.edges[edge_id].from_vertex.num_edges_out() > 1 and \
+               self.dna.edges[edge_id].from_vertex.mutable_out and \
+               self.dna.edges[edge_id].to_vertex.num_edges_in() > 1 and \
+               self.dna.edges[edge_id].to_vertex.mutable_in):
                 removable_edges.append(self.dna.edges[edge_id])
         
         return(removable_edges)
@@ -223,8 +229,6 @@ class Mutation:
     
         selected_edge = choice(edges_mutable_to)
         
-        # graft the vertex and identity edge in the network
-
         # create the new identity edge between new vertex and the to_vertex of the selected edge
         new_identity_edge = Edge(Settings.GLOBAL_EDGE_ID, new_vertex,
                                  selected_edge.to_vertex, type=Settings.IDENTITY)
@@ -232,23 +236,24 @@ class Mutation:
         self.dna.edges[Settings.GLOBAL_EDGE_ID] = new_identity_edge
         Settings.GLOBAL_EDGE_ID += 1
 
+        # graft the new vertex and identity edge into the network
+
         try:
+            # graft the identity edge to the new_vertex
+            new_vertex.add_edge_out(new_identity_edge)
+
+            # graft the identity edge in the to_vertex (rest of the network)
             selected_edge.to_vertex.add_edge_in(new_identity_edge)
 
-        except ImmutableException:
-            print("Weird Immutable exception while connecting identity edge")
-            self.dna = saved_dna
-            return(has_mutated)
-
-        # cut the connection between the selected edge and the to_vertex and connect the edge
-        # to the new vertex
-
-        try:
+            # cut the connection between the selected edge and the to_vertex
             selected_edge.to_vertex.remove_edge_in(selected_edge)
+
+            # graft the selected edge to the new vertex
             selected_edge.to_vertex = new_vertex
+            new_vertex.add_edge_in(selected_edge)
 
         except ImmutableException:
-            print("Weird Immutable exception while grafting the new vertex to the selected edge")
+            print("Weird Immutable exception while grafting the new vertex and identity edge")
             self.dna = saved_dna
             return(has_mutated)
         
@@ -318,7 +323,7 @@ class Mutation:
         if(index_in < len(vertex_to_remove.edges_in)):
             
             # number of edges_in > number of edges_out
-            # we connect the remaining edges_in to the last edge_out
+            # we connect the remaining edges_in to the last to_v
             while(index_in < len(vertex_to_remove.edges_in)):
                 
                 e_in = vertex_to_remove.edges_in[index_in]
@@ -370,6 +375,11 @@ class Mutation:
                 
                 index_out += 1
             
+        # clean the vertices and edges dictionaries 
+        for edge_out in vertex_to_remove.edges_out:
+            self.dna.remove_edge(edge_out)
+        
+        self.dna.remove_vertex(vertex_to_remove)
 
         # finally mutation can be marked as complete
         has_mutated = True
@@ -385,7 +395,7 @@ class Mutation:
 
             v = self.dna.vertices[vertex_id]
 
-            # if the vertex has at least one edge_out and it's not the root vertex (index 0)
+            # if the vertex has at least one edge_out and it's not the root/input vertex 
             if len(v.edges_out) > 0 and vertex_id != self.dna.input_vertex_id:
 
                 # add the vertex to the list if all edges_out are connected to vertices
@@ -394,6 +404,7 @@ class Mutation:
                 edge_index = 0
                 while(edge_index < len(v.edges_out) and can_add):
 
+                    # please forgive me Demeter
                     if(not v.edges_out[edge_index].to_vertex.mutable_in):
                         can_add = False
 

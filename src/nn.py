@@ -236,7 +236,7 @@ class NN:
         
         if e.type == Settings.FULLY_CONNECTED:
 
-            tensor = tf.layers.dense(tensor, e.units, use_bias=True)
+            tensor = tf.layers.dense(tensor, e.units, use_bias=True, kernel_initializer = glorot_uniform_initializer())
 
         elif e.type == Settings.CONVOLUTIONAL:
 

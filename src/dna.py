@@ -32,13 +32,23 @@ class DNA:
             self.vertices[v.id] = v
             
 
-    
     def add_edge(self, e):
 
         if(e.id not in self.edges):
             self.edges[e.id] = e
             
-    
+
+    def remove_vertex(self, v):
+
+        if(v.id in self.vertices):
+            self.vertices.pop(v.id)
+
+
+    def remove_edge(self, e):
+
+        if(e.id in self.edges):
+            self.edges.pop(e.id)
+
 
     def __str__(self):
 
@@ -68,6 +78,10 @@ class DNA:
         """
         Create a primitive neural network structure that flattens the input and
         uses one dense layer to map the flatten input to the output shape
+        The primitive structure should also make possible the evolution toward 
+        a more sophisticated topology 
+
+        [input] --- id --- [flatten] --- id --- [buffer] --- fc --- [output]
         """
     
         # create input vertex  
@@ -75,14 +89,19 @@ class DNA:
         self.input_vertex_id = Settings.GLOBAL_VERTEX_ID
         Settings.GLOBAL_VERTEX_ID += 1
 
-        # create output vertex
-        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, False, False])
-        self.output_vertex_id = Settings.GLOBAL_VERTEX_ID
-        Settings.GLOBAL_VERTEX_ID += 1
-
         # create flatten vertex
         self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[True, True, True], flatten=Settings.FLATTEN)
         self.flatten_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
+
+        # create buffer vertex
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[True, False, True])
+        self.buffer_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
+
+        # create output vertex
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, False, False])
+        self.output_vertex_id = Settings.GLOBAL_VERTEX_ID
         Settings.GLOBAL_VERTEX_ID += 1
 
         # create an identity edge to connect the input with the flatten vertex
@@ -90,22 +109,33 @@ class DNA:
         input_to_flatten_edge_id = Settings.GLOBAL_EDGE_ID
         Settings.GLOBAL_EDGE_ID += 1
 
-        # create fc edge between the flatten vertex and output with the number of units equal to the output shape
-        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[self.flatten_vertex_id], self.vertices[self.output_vertex_id], units=self.output_shape)
-        flatten_to_output_edge_id = Settings.GLOBAL_EDGE_ID
+        # create an identity edge to connect the flatten with the buffer vertex
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[self.flatten_vertex_id], self.vertices[self.buffer_vertex_id], type=Settings.IDENTITY)
+        flatten_to_buffer_edge_id = Settings.GLOBAL_EDGE_ID
         Settings.GLOBAL_EDGE_ID += 1
 
-        # link the input and output (switch on mutability temporarily)
-        # switch on mutability
+        # create non-mutable fc edge between the buffer and output vertex with the number of units equal to the output shape
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[self.buffer_vertex_id], self.vertices[self.output_vertex_id], units=self.output_shape, mutable=[False, False, False])
+        buffer_to_output_edge_id = Settings.GLOBAL_EDGE_ID
+        Settings.GLOBAL_EDGE_ID += 1
+
+        # link the vertices and edges of the graph to connect the input with the output
+        # switch on mutability temporarily
+        self.vertices[self.buffer_vertex_id].mutable_out = True
         self.vertices[self.output_vertex_id].mutable_in = True
 
         # add the link between the input and flatten vertex
         self.vertices[self.input_vertex_id].add_edge_out(self.edges[input_to_flatten_edge_id])
         self.vertices[self.flatten_vertex_id].add_edge_in(self.edges[input_to_flatten_edge_id])
 
-        # add the link between the flatten and output vertex
-        self.vertices[self.flatten_vertex_id].add_edge_out(self.edges[flatten_to_output_edge_id])
-        self.vertices[self.output_vertex_id].add_edge_in(self.edges[flatten_to_output_edge_id])
+        # add the link between the flatten and buffer vertex
+        self.vertices[self.flatten_vertex_id].add_edge_out(self.edges[flatten_to_buffer_edge_id])
+        self.vertices[self.buffer_vertex_id].add_edge_in(self.edges[flatten_to_buffer_edge_id])
 
-        # switch back off mutability
+        # add the link between the buffer and output vertex
+        self.vertices[self.buffer_vertex_id].add_edge_out(self.edges[buffer_to_output_edge_id])
+        self.vertices[self.output_vertex_id].add_edge_in(self.edges[buffer_to_output_edge_id])
+
+        # switch mutability back off
+        self.vertices[self.buffer_vertex_id].mutable_out = False
         self.vertices[self.output_vertex_id].mutable_in = False
