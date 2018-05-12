@@ -1,6 +1,7 @@
 
 from dna import DNA
 from exceptions import NoBridgeException
+from settings import Settings
 
 from collections import deque
 from random import choice
@@ -10,8 +11,8 @@ class Cross_Over:
 
     def __init__(self, parent_1, parent_2):
 
-        self.parent_1 = DNA()
-        self.parent_2 = DNA()
+        self.parent_1 = parent_1
+        self.parent_2 = parent_2
 
 
     def breed(self):
@@ -36,7 +37,7 @@ class Cross_Over:
     def create_offsprings(self, bridge_1_v_id, bridge_2_v_id):
                 
         # create a fusion of the two parents
-        parents_fusion = DNA()
+        parents_fusion = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
         parents_fusion.vertices.update(deepcopy(self.parent_1.vertices))
         parents_fusion.vertices.update(deepcopy(self.parent_2.vertices))
         parents_fusion.edges.update(deepcopy(self.parent_1.edges))
@@ -48,10 +49,10 @@ class Cross_Over:
         parents_fusion.vertices[bridge_2_v_id].edges_out = swap_tmp
 
         for e in parents_fusion.vertices[bridge_1_v_id].edges_out:
-            e.from_vertex = bridge_1_v_id
+            e.from_vertex = parents_fusion.vertices[bridge_1_v_id]
 
         for e in parents_fusion.vertices[bridge_2_v_id].edges_out:
-            e.from_vertex = bridge_2_v_id
+            e.from_vertex = parents_fusion.vertices[bridge_2_v_id]
 
         # grow the offsprings by walking the two graphs from their respective input
         offspring_1 = self.grow_offspring(parents_fusion, self.parent_1.input_vertex_id, self.parent_2.output_vertex_id)
@@ -67,14 +68,14 @@ class Cross_Over:
         explored = {}
 
         # create the empty offspring
-        offspring = DNA()
+        offspring = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
 
         # populate it's vertices and edges attributes
         offspring.input_vertex_id = input_vertex_id
         offspring.output_vertex_id = output_vertex_id
 
         # start walking the graph from the input vertex
-        vertex_q.append(parents_fusion[input_vertex_id])
+        vertex_q.append(parents_fusion.vertices[input_vertex_id])
 
         while(len(vertex_q) > 0):
 

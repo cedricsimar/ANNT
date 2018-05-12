@@ -7,6 +7,7 @@ from dna import DNA
 from mutation import Mutation
 from cross_over import Cross_Over
 from nn import NN
+from utils import reshape_mnist_images
 
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
@@ -20,7 +21,8 @@ class GeneticAlgorithm(object):
         self.mutations_per_generation = mutations_per_generation
 
         self.mnist = input_data.read_data_sets("MNIST_data", one_hot=True)
-        self.validation_data = self.mnist.test.images
+        
+        self.validation_data = reshape_mnist_images(self.mnist.test.images)
         self.validation_labels = self.mnist.test.labels
 
         self.population = []
@@ -140,7 +142,7 @@ class GeneticAlgorithm(object):
             self.next_generation_nn.append(mutated_offspring_2_nn)
 
 
-    def train_network(self, nn):
+    def train_network(self, nn, sess):
 
         """
         Train the Neural Network for a fixed number of steps and regularly evaluate
@@ -148,13 +150,15 @@ class GeneticAlgorithm(object):
         """
 
         best_validation_error = 1
-        sess = tf.Session(graph=nn.get_graph())
+        # sess = tf.Session(graph=nn.get_graph())
         sess.run(tf.global_variables_initializer())
 
         for training_step in range(Settings.TRAINING_STEPS):
             
             # training step
             images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
+            images = reshape_mnist_images(images)
+
             sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
 
             # performance evaluation every few training steps
@@ -173,8 +177,17 @@ class GeneticAlgorithm(object):
         primitive neural networks with an input-output structure
         """
 
-        for individual in range(self.population_size):
+        for individual_i in range(self.population_size):
             
-            dna = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
-            dna.create_primitive_structure()
-            self.population.append(dna)
+            individual_dna = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
+            individual_dna.create_primitive_structure()
+
+            with tf.Session() as sess:
+                individual_nn = NN(individual_dna)
+                individual_fitness = self.train_network(individual_nn, sess)
+            
+            tf.reset_default_graph()
+
+            self.population.append(individual_dna)
+            self.neural_networks.append(individual_nn)
+            self.fitness.append(individual_fitness)

@@ -20,6 +20,13 @@ class InvalidNumberOfEdges(Exception):
         super().__init__(message)
 
 
+class ImpossibleToBuild(Exception):
+
+    def __init__(self, message = "The Neural Network is impossible to build"): # self.errors = errors for custom code
+
+        super().__init__(message)
+
+
 class NoBridgeException(Exception):
 
     def __init__(self, message = "No bridge found in a parent Neural Network"):

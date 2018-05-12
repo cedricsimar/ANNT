@@ -4,7 +4,7 @@ from collections import deque
 
 from tf_decorator import *
 from settings import Settings
-from exceptions import InvalidNumberOfEdges
+from exceptions import InvalidNumberOfEdges, ImpossibleToBuild
 
 import tensorflow as tf
 from tensorflow.python.ops import array_ops as tf_array_ops
@@ -22,13 +22,13 @@ class NN:
         """
 
         # Tensorflow graph
-        self.graph = tf.Graph()
+        # self.graph = tf.Graph()
 
         # DNA of the Neural Network
         self.dna = dna
 
         # Graph vertex root
-        self.root = self.dna.vertices[0]
+        self.root = self.dna.vertices[self.dna.input_vertex_id]
 
         # tensors created by edges and vertices from the DNA
         self.vertices_tensor = {}
@@ -58,12 +58,10 @@ class NN:
         self.layers = {}
 
         # initialize tensorflow graph
-        with self.graph.as_default():
-
-            self.predict
-            self.prediction_error
-            self.optimize
-            self.loss
+        self.predict
+        self.prediction_error
+        self.optimize
+        self.loss
             
 
         # # Initialize input placeholder to assign values to weights and biases
@@ -105,7 +103,7 @@ class NN:
             self.queue.append(edge_out)
 
         # add the resulting tensor in a dictionary using the vertex id
-        self.vertices_tensor[0] = input_layer
+        self.vertices_tensor[self.dna.input_vertex_id] = input_layer
 
 
         """
@@ -131,9 +129,13 @@ class NN:
                         self.queue.append(edge_out)
                 
                 else:
-                    # put vertex back in queue
-                    # more tensors have to be created before this one 
-                    self.queue.append(graph_object)
+                    # put vertex back in queue 
+                    # more tensors have to be created before this one
+                    # if the queue is empty raise exception to avoid infinite loop
+                    if(len(self.queue) > 0):
+                        self.queue.append(graph_object)
+                    else:
+                        raise ImpossibleToBuild()
 
             else:
                 
@@ -152,7 +154,11 @@ class NN:
                 else:
                     # put edge back in queue
                     # more tensors have to be created before this one 
-                    self.queue.append(graph_object)
+                    # if the queue is empty raise exception to avoid infinite loop
+                    if(len(self.queue) > 0):
+                        self.queue.append(graph_object)
+                    else:
+                        raise ImpossibleToBuild()
         
         return(tensor)
 
@@ -277,7 +283,7 @@ class NN:
     def get_graph(self):
         return(self.graph)
     
-    
+
     def get_value(self, var_name, tf_session):
         """
         Return the value of the tf variable named [var_name] if it exists, None otherwise

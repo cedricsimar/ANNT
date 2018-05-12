@@ -355,7 +355,7 @@ class Mutation:
             v = self.dna.vertices[vertex_id]
 
             # if the vertex has at least one edge_out and it's not the root vertex (index 0)
-            if len(v.edges_out) > 0 and vertex_id:
+            if len(v.edges_out) > 0 and vertex_id != self.dna.input_vertex_id:
 
                 # add the vertex to the list if all edges_out are connected to vertices
                 # that are all mutable_in (otherwise the subsequent reconnection couldn't occur)

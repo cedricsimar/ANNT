@@ -108,4 +108,4 @@ class DNA:
         self.vertices[self.output_vertex_id].add_edge_in(self.edges[flatten_to_output_edge_id])
 
         # switch back off mutability
-        self.vertices[1].mutable_in = False
+        self.vertices[self.output_vertex_id].mutable_in = False
