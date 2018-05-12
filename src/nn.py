@@ -21,8 +21,8 @@ class NN:
         Neural Network build using a DNA object
         """
 
-        # Tensorflow graph
-        # self.graph = tf.Graph()
+        # Tensorflow session (one session per NN class)
+        # self.sess = tf.Session()
 
         # DNA of the Neural Network
         self.dna = dna

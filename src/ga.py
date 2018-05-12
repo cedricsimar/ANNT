@@ -80,11 +80,11 @@ class GeneticAlgorithm(object):
             # train every non-trained neural network of the next generation
             # on the MNIST dataset and store it's best fitness score
 
-            for individual_i in range(Settings.N_BEST_CANDIDATES, self.population_size):
+            # for individual_i in range(Settings.N_BEST_CANDIDATES, self.population_size):
 
-                # train the neural network and store the individual's fitness score
-                individual_fitness = self.train_network(self.next_generation_nn[individual_i])
-                self.next_generation_fitness[individual_i] = individual_fitness
+            #     # train the neural network and store the individual's fitness score
+            #     individual_fitness = self.train_network(self.next_generation_nn[individual_i])
+            #     self.next_generation_fitness[individual_i] = individual_fitness
             
             # sort the next generation individuals by fitness
             self.next_generation_fitness, self.next_generation_dna, self.next_generation_nn = (list(t) for t in zip(*sorted(zip(self.next_generation_fitness, self.next_generation_dna, self.next_generation_nn))))
@@ -95,17 +95,12 @@ class GeneticAlgorithm(object):
             self.fitness = self.next_generation_fitness
 
 
-            # # save graph logs
-            # writer = tf.summary.FileWriter("./tmp/log", sess.graph)
-            # writer.close()
-
-
     def attempt_breeding(self, individual_i, individual_j):
 
         """
         Attempt to breed the two individuals (several times if necessary)
         If the breeding is successful and the Neural Networks can be built,
-        the two offsprings are added into the next generation
+        the two offsprings are added into the next generation.
 
         The breeding process is the following:
             - cross-over between the two lovers
@@ -114,35 +109,44 @@ class GeneticAlgorithm(object):
 
         """
 
-        breed_sucessful = False
+        successful_breedings = 0
         breeding_attempts = 0
-        while(not breed_sucessful and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
+        while(successful_breedings < 2 and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
             
             offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
             
             if(offspring_1 is not None and offspring_2 is not None):
+                
                 mutated_offspring_1 = Mutation(offspring_1).mutate()
                 mutated_offspring_2 = Mutation(offspring_2).mutate()
 
-                try:
-                    mutated_offspring_1_nn = NN(mutated_offspring_1)
-                    mutated_offspring_2_nn = NN(mutated_offspring_2)
-                    breed_sucessful = True
-                except Exception as e:
-                    print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
+                # have to train the successfully bred graphs on the spot
+                # because of tensorflow graphs handling problems :'(
+
+                for offspring in [mutated_offspring_1, mutated_offspring_2]:
+                    
+                    if(successful_breedings < 2):
+                            
+                        try:
+                            offspring_nn = NN(offspring)
+                            offspring_fitness = self.train_network(offspring_nn)
+                            self.next_generation_dna.append(offspring)
+                            self.next_generation_nn.append(offspring_nn)
+                            self.next_generation_fitness.append(offspring_fitness)
+                            successful_breedings += 1
+
+                        except Exception as e:
+                            print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
+                        
+                        tf.reset_default_graph()
+                
             else:
                 print("Failed to cross-over the individuals")
             
-            breeding_attempts += 1
-        
-        if breed_sucessful:
-            self.next_generation_dna.append(mutated_offspring_1)
-            self.next_generation_dna.append(mutated_offspring_2)
-            self.next_generation_nn.append(mutated_offspring_1_nn)
-            self.next_generation_nn.append(mutated_offspring_2_nn)
+        return(successful_breedings)
 
 
-    def train_network(self, nn, sess):
+    def train_network(self, nn):
 
         """
         Train the Neural Network for a fixed number of steps and regularly evaluate
@@ -150,23 +154,31 @@ class GeneticAlgorithm(object):
         """
 
         best_validation_error = 1
-        # sess = tf.Session(graph=nn.get_graph())
-        sess.run(tf.global_variables_initializer())
 
-        for training_step in range(Settings.TRAINING_STEPS):
-            
-            # training step
-            images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
-            images = reshape_mnist_images(images)
+        with tf.Session() as sess:
+                
+            # sess = tf.Session(graph=nn.get_graph())
+            sess.run(tf.global_variables_initializer())
+            # nn.sess.run(tf.initialize_local_variables())
 
-            sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
+            for training_step in range(Settings.TRAINING_STEPS):
+                
+                # training step
+                images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
+                images = reshape_mnist_images(images)
 
-            # performance evaluation every few training steps
-            if not training_step % Settings.EVALUATION_RATE:
-                validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels: self.validation_labels})
-                print('Test error {:6.2f}%'.format(100 * validation_error))
-                best_validation_error = min(best_validation_error, validation_error)
-        
+                sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
+
+                # performance evaluation every few training steps
+                if not training_step % Settings.EVALUATION_RATE:
+                    validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels: self.validation_labels})
+                    print('Test error {:6.2f}%'.format(100 * validation_error))
+                    best_validation_error = min(best_validation_error, validation_error)
+
+            # # save graph logs
+            writer = tf.summary.FileWriter("./tmp/log", sess.graph)
+            # writer.close()
+
         return(best_validation_error)
 
 
@@ -182,9 +194,8 @@ class GeneticAlgorithm(object):
             individual_dna = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
             individual_dna.create_primitive_structure()
 
-            with tf.Session() as sess:
-                individual_nn = NN(individual_dna)
-                individual_fitness = self.train_network(individual_nn, sess)
+            individual_nn = NN(individual_dna)
+            individual_fitness = self.train_network(individual_nn)
             
             tf.reset_default_graph()
 
