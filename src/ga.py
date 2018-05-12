@@ -176,7 +176,7 @@ class GeneticAlgorithm(object):
                     best_validation_error = min(best_validation_error, validation_error)
 
             # save graph logs
-            log_path = "./tmp/log/" + str(self.generation) + "/" + "{:7.5}".format(best_validation_error).strip()
+            log_path = "./tmp/log/" + str(self.generation) + "/" + "{:f}".format(best_validation_error)
             writer = tf.summary.FileWriter(log_path, sess.graph)
             writer.close()
 
