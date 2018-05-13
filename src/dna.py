@@ -50,27 +50,61 @@ class DNA:
             self.edges.pop(e.id)
 
 
-    def __str__(self):
+    def pretty_print(self):
 
-        net_str = ""
+        print("Vertices")
+        print("--------", end ='')
 
-        # for v in self.vertices.keys():
+        for v_id in self.vertices:
 
+            v = self.vertices[v_id]
 
-        for e in self.edges.keys():
-
-            if self.edges[e].type == Settings.FULLY_CONNECTED:
-                net_str += "Fully connected layer "
-            elif self.edges[e].type == Settings.CONVOLUTIONAL:
-                net_str += "Convolutional layer "
-            elif self.edges[e].type == Settings.IDENTITY:
-                net_str += "Identity layer "
+            print("\n\nVertex " + str(v.id) + ": ", end='')
+            if(v.action == 0):
+                print("No action - ", end='')
+            elif(v.action == 1):
+                print("Sum - ", end='')
+            elif(v.action == 1):
+                print("Concatenation - ", end='')
             
-            net_str += "from vertex " + str(self.edges[e].from_vertex.id)
-            net_str += " to vertex " + str(self.edges[e].to_vertex.id)
-            net_str += "\n"
-        
-        return (net_str)
+            if(v.activation):
+                print("ReLu - ", end='')
+            else:
+                print("Linear - ", end='')
+            
+            if(v.max_pooling):
+                print("Max Pooling - ", end='')
+            
+            if(v.dropout):
+                print("Dropout - ", end='')
+            
+            if(v.flatten):
+                print("Flatten", end='')
+
+            print("\nInput edges : ", end='')
+            for e_in in v.edges_in:
+                print(str(e_in.id) + "  ", end='')
+
+            print("\nOutput edges : ", end='')
+            for e_out in v.edges_out:
+                print(str(e_out.id) + "  ", end='')
+
+        print("\n\n")
+        print("Edges")
+        print("--------\n")
+
+        for e_id in self.edges:
+
+            e = self.edges[e_id]
+
+            print("Edge " + str(e.id) + " from " + str(e.from_vertex.id) + " to " + str(e.to_vertex.id) + ": ", end='')
+
+            if e.type == Settings.FULLY_CONNECTED:
+                print("Fully connected layer\n")
+            elif e.type == Settings.CONVOLUTIONAL:
+                print("Convolutional layer\n")
+            elif e.type == Settings.IDENTITY:
+                print("Identity layer\n")
         
 
     def create_primitive_structure(self):
