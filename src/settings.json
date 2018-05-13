@@ -16,7 +16,7 @@
         "value": 10
     },
     "TRAINING_STEPS": {
-        "desc": "Number of training steps per individual (default: 600)",
+        "desc": "Number of training steps per individual (default: 600, paper: 25.600)",
         "value": 120
     },
     "N_BEST_CANDIDATES": {
@@ -148,8 +148,8 @@
         "value": 0.3
     },
     "MINIBATCH_SIZE": {
-        "desc": "Number of training cases over which each stochastic gradient descent (SGD) update is computed",
-        "value": 100
+        "desc": "(default: 100) Number of training cases over which each stochastic gradient descent (SGD) update is computed",
+        "value": 50
     },
     "NORMALIZATION_EPSILON": {
         "desc": "Epsilon used in batch normalization",
