@@ -20,8 +20,6 @@ class Mutation:
     
     def mutate(self):
 
-        print("Mutating")
-
         # mutate the dna 
         # for _ in range(self.mutations_per_generation):
         has_mutated = True
@@ -40,7 +38,12 @@ class Mutation:
                 mutation_keys.remove(mutation)
 
                 # try the mutation
+                print("Trying mutation:", mutation)
                 has_mutated = self.mutations[mutation]()
+                if(has_mutated):
+                    print("Mutation completed")
+                else:
+                    print("Mutation failed")
 
         return (self.dna)
         
@@ -86,6 +89,8 @@ class Mutation:
             self.dna = saved_dna
             return(has_mutated)
 
+        # add the edge to the edges dictionary
+        self.dna.add_edge(new_edge)
 
         # since we added a new input edge to a vertex, we check if the vertex action variable
         # is set to SUM or CONCATENATION (because it's the only actions that support multiple
@@ -214,8 +219,6 @@ class Mutation:
         new_vertex = Vertex(Settings.GLOBAL_VERTEX_ID,
                             activation=choice([Settings.LINEAR, Settings.RELU]),
                             dropout=choice([Settings.NO_DROPOUT, Settings.USE_DROPOUT]))
-
-        self.dna.vertices[Settings.GLOBAL_VERTEX_ID] = new_vertex
         Settings.GLOBAL_VERTEX_ID += 1
 
         # select possible edges and choose a candidate 
@@ -232,8 +235,6 @@ class Mutation:
         # create the new identity edge between new vertex and the to_vertex of the selected edge
         new_identity_edge = Edge(Settings.GLOBAL_EDGE_ID, new_vertex,
                                  selected_edge.to_vertex, type=Settings.IDENTITY)
-
-        self.dna.edges[Settings.GLOBAL_EDGE_ID] = new_identity_edge
         Settings.GLOBAL_EDGE_ID += 1
 
         # graft the new vertex and identity edge into the network
@@ -257,6 +258,10 @@ class Mutation:
             self.dna = saved_dna
             return(has_mutated)
         
+        # add the new vertex and edge to their respective dictionary
+        self.dna.add_vertex(new_vertex)
+        self.dna.add_edge(new_identity_edge)
+
         # finally mutation can be marked as complete
         has_mutated = True
 

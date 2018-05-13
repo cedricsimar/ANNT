@@ -25,7 +25,16 @@ class DNA:
 
         self.num_fully_connected_layers = 0 # limit to 2 FC to limit computation time
 
+        self.mama = None
+        self.papa = None
+        
+
+
+    def __lt__(self, dna2):
+        # IDs are unique globally
+        return(self.input_vertex_id < dna2.input_vertex_id)
     
+
     def add_vertex(self, v):
 
         if(v.id not in self.vertices):
@@ -48,6 +57,71 @@ class DNA:
 
         if(e.id in self.edges):
             self.edges.pop(e.id)
+
+
+    def __str__(self):
+
+        dna_str = ""
+
+        dna_str += "Vertices\n"
+        dna_str += "--------"
+
+        for v_id in self.vertices:
+
+            v = self.vertices[v_id]
+
+            dna_str += "\n\nVertex " + str(v.id) + ": "
+            if(v.action == 0):
+                dna_str += "No action - "
+            elif(v.action == 1):
+                dna_str += "Sum - "
+            elif(v.action == 2):
+                dna_str += "Concatenation - "
+            
+            if(v.activation):
+                dna_str += "ReLu - "
+            else:
+                dna_str += "Linear - "
+            
+            if(v.max_pooling):
+                dna_str += "Max Pooling - "
+            
+            if(v.dropout):
+                dna_str += "Dropout - "
+            
+            if(v.flatten):
+                dna_str += "Flatten"
+
+            dna_str += "\nInput edges : "
+            for e_in in v.edges_in:
+                dna_str += str(e_in.id) + "  "
+
+            dna_str += "\nOutput edges : "
+            for e_out in v.edges_out:
+                dna_str += str(e_out.id) + "  "
+        
+        dna_str += "\n\n"
+        dna_str += "Edges\n"
+        dna_str += "-----\n\n"
+
+        for e_id in self.edges:
+
+            e = self.edges[e_id]
+
+            dna_str += "Edge " + str(e.id) + " from " + str(e.from_vertex.id) + " to " + str(e.to_vertex.id) + ": "
+
+            if e.type == Settings.FULLY_CONNECTED:
+                dna_str += "Fully connected layer\n\n"
+            elif e.type == Settings.CONVOLUTIONAL:
+                dna_str += "Convolutional layer\n\n"
+            elif e.type == Settings.IDENTITY:
+                dna_str += "Identity layer\n\n"
+
+        dna_str += "\n\n"
+        dna_str += "Input ID: " + str(self.input_vertex_id) + "\n"
+        dna_str += "Output ID: " + str(self.output_vertex_id) + "\n"
+
+        return(dna_str)
 
 
     def pretty_print(self):
@@ -91,7 +165,7 @@ class DNA:
 
         print("\n\n")
         print("Edges")
-        print("--------\n")
+        print("-----\n")
 
         for e_id in self.edges:
 

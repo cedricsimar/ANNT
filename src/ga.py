@@ -40,6 +40,11 @@ class GeneticAlgorithm(object):
         Evolve the population for a fixed number of generations
         """
 
+        print("initial")
+        print("----------------------------------")
+        print(len(self.population), len(self.neural_networks), len(self.fitness))
+        print("----------------------------------")
+
         for gen in range(num_generations):
 
             self.generation += 1
@@ -64,13 +69,14 @@ class GeneticAlgorithm(object):
                     self.attempt_breeding(best_i, best_j)
             
             # breed each best individual with a random individual from the population
+            # including itself because, well.. parthenogenesis and all..
             # (produces at most 6 offsprings)
             for best_i in range(Settings.N_BEST_CANDIDATES):
                 other_i = randint(0, self.population_size - 1)
                 self.attempt_breeding(best_i, other_i)
 
-            # breed random individuals together until the number of offsprings reaches 
-            # the maximum population size
+            # breed two different random individuals together until the number of offsprings 
+            # reaches the maximum population size
             while(len(self.next_generation_dna) < self.population_size):
                 other_i = randint(0, self.population_size - 1)
                 other_j = randint(0, self.population_size - 1)
@@ -94,6 +100,10 @@ class GeneticAlgorithm(object):
             self.neural_networks = self.next_generation_nn
             self.fitness = self.next_generation_fitness
 
+            print("----------------------------------")
+            print(len(self.population), len(self.neural_networks), len(self.fitness))
+            print("----------------------------------")
+
 
     def attempt_breeding(self, individual_i, individual_j):
 
@@ -113,36 +123,38 @@ class GeneticAlgorithm(object):
         breeding_attempts = 0
         while(successful_breedings < 2 and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
             
-            offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
+            try:
+                offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
             
-            if(offspring_1 is not None and offspring_2 is not None):
+            except NoBridgeException as e:
+                print(e)
+                print("Failed to cross-over the individuals")
+                return (False)
                 
-                mutated_offspring_1 = Mutation(offspring_1).mutate()
-                mutated_offspring_2 = Mutation(offspring_2).mutate()
+
+            for offspring in [offspring_1, offspring_2]:
+
+                                
+                mutated_offspring = Mutation(offspring).mutate()
 
                 # have to train the successfully bred graphs on the spot
                 # because of tensorflow graphs handling problems :'(
 
-                for offspring in [mutated_offspring_1, mutated_offspring_2]:
-                    
-                    if(successful_breedings < 2):
-                            
-                        try:
-                            offspring_nn = NN(offspring)
-                            offspring_fitness = self.train_network(offspring_nn)
-                            self.next_generation_dna.append(offspring)
-                            self.next_generation_nn.append(offspring_nn)
-                            self.next_generation_fitness.append(offspring_fitness)
-                            successful_breedings += 1
-
-                        except Exception as e:
-                            print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
+                if(successful_breedings < 2):
                         
-                        tf.reset_default_graph()
-                
-            else:
-                print("Failed to cross-over the individuals")
-            
+                    try:
+                        offspring_nn = NN(offspring)
+                        offspring_fitness = self.train_network(offspring_nn)
+                        self.next_generation_dna.append(offspring)
+                        self.next_generation_nn.append(offspring_nn)
+                        self.next_generation_fitness.append(offspring_fitness)
+                        successful_breedings += 1
+
+                    except Exception as e:
+                        print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
+                    
+                    tf.reset_default_graph()
+        print("================ BREEDING COMPLETE =================")            
         return(successful_breedings)
 
 
@@ -154,6 +166,7 @@ class GeneticAlgorithm(object):
         """
 
         best_validation_error = 1
+        print(nn.dna)
 
         with tf.Session() as sess:
                 
@@ -175,10 +188,17 @@ class GeneticAlgorithm(object):
                     print('Test error {:6.2f}%'.format(100 * validation_error))
                     best_validation_error = min(best_validation_error, validation_error)
 
-            # save graph logs
+            # save graph logs and dna string
             log_path = "./tmp/log/" + str(self.generation) + "/" + "{:f}".format(best_validation_error)
+            
             writer = tf.summary.FileWriter(log_path, sess.graph)
             writer.close()
+
+            file_path = log_path + "/topology.txt"
+            with open(file_path, 'w') as topo_file:
+                topo_file.write(nn.dna.__str__())
+        
+        print("Training and Saving complete !")
 
         return(best_validation_error)
 
