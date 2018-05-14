@@ -1,0 +1,26 @@
+Vertices
+--------
+
+Vertex 24: No action - Linear - 
+Input edges : 
+Output edges : 18  
+
+Vertex 25: No action - Linear - Flatten
+Input edges : 18  
+Output edges : 5  
+
+Vertex 7: No action - Linear - 
+Input edges : 5  
+Output edges : 
+
+Edges
+-----
+
+Edge 18 from 24 to 25: Identity layer
+
+Edge 5 from 25 to 7: Fully connected layer
+
+
+
+Input ID: 24
+Output ID: 7

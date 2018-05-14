@@ -119,18 +119,17 @@ class GeneticAlgorithm(object):
         breeding_attempts = 0
         while(successful_breedings < 2 and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
             
-            # try:
-            #     offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
+            try:
+                offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
             
-            # except NoBridgeException as e:
-            #     print(e)
-            #     print("Failed to cross-over the individuals")
-            #     return (False)
+            except NoBridgeException as e:
+                print(e)
+                print("Failed to cross-over the individuals")
+                return (False)
                 
 
-            # for offspring in [offspring_1, offspring_2]:
-            for offspring in [self.population[individual_i], self.population[individual_j]]:
-
+            for offspring in [offspring_1, offspring_2]:
+            
                 mutated_offspring = Mutation(offspring).mutate()
 
                 # Train the crossed-mutated graphs on the spot

@@ -1,0 +1,40 @@
+Vertices
+--------
+
+Vertex 8: No action - Linear - 
+Input edges : 
+Output edges : 6  75  
+
+Vertex 9: Sum - Linear - Flatten
+Input edges : 6  75  
+Output edges : 28  
+
+Vertex 86: No action - ReLu - Dropout - Flatten
+Input edges : 28  
+Output edges : 67  
+
+Vertex 38: No action - Linear - 
+Input edges : 67  
+Output edges : 29  
+
+Vertex 39: No action - Linear - 
+Input edges : 29  
+Output edges : 
+
+Edges
+-----
+
+Edge 6 from 8 to 9: Convolutional layer
+
+Edge 75 from 8 to 9: Identity layer
+
+Edge 28 from 9 to 86: Identity layer
+
+Edge 67 from 86 to 38: Identity layer
+
+Edge 29 from 38 to 39: Fully connected layer
+
+
+
+Input ID: 8
+Output ID: 39
