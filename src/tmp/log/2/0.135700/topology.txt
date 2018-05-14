@@ -20,7 +20,7 @@ Output edges :
 Edges
 -----
 
-Edge 12 from 16 to 17: Identity layer
+Edge 12 from 16 to 17: Convolutional layer
 
 Edge 13 from 17 to 18: Identity layer
 

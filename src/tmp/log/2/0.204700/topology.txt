@@ -9,7 +9,7 @@ Vertex 17: No action - Linear - Flatten
 Input edges : 12  
 Output edges : 13  
 
-Vertex 18: No action - Linear - 
+Vertex 18: No action - Linear - Dropout - 
 Input edges : 13  
 Output edges : 14  
 

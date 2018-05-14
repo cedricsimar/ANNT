@@ -6,7 +6,7 @@ Input edges :
 Output edges : 3  
 
 Vertex 5: No action - Linear - Flatten
-Input edges : 3  
+Input edges : 61  
 Output edges : 4  
 
 Vertex 6: No action - Linear - 
@@ -17,14 +17,20 @@ Vertex 7: No action - Linear -
 Input edges : 5  
 Output edges : 
 
+Vertex 81: No action - Linear - Dropout - 
+Input edges : 3  
+Output edges : 61  
+
 Edges
 -----
 
-Edge 3 from 4 to 5: Identity layer
+Edge 3 from 4 to 81: Identity layer
 
 Edge 4 from 5 to 6: Identity layer
 
 Edge 5 from 6 to 7: Fully connected layer
+
+Edge 61 from 81 to 5: Identity layer
 
 
 

@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 44: No action - Linear - 
+Input edges : 
+Output edges : 33  
+
+Vertex 45: No action - Linear - Flatten
+Input edges : 77  
+Output edges : 34  
+
+Vertex 46: No action - Linear - 
+Input edges : 34  
+Output edges : 35  
+
+Vertex 47: No action - Linear - 
+Input edges : 35  
+Output edges : 
+
+Vertex 90: No action - Linear - Dropout - 
+Input edges : 33  
+Output edges : 77  
+
+Edges
+-----
+
+Edge 33 from 44 to 90: Identity layer
+
+Edge 34 from 45 to 46: Identity layer
+
+Edge 35 from 46 to 47: Fully connected layer
+
+Edge 77 from 90 to 45: Identity layer
+
+
+
+Input ID: 44
+Output ID: 47

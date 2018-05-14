@@ -10,21 +10,27 @@ Input edges : 12
 Output edges : 13  
 
 Vertex 18: No action - Linear - 
-Input edges : 13  
+Input edges : 83  
 Output edges : 14  
 
 Vertex 19: No action - Linear - 
 Input edges : 14  
 Output edges : 
 
+Vertex 95: No action - ReLu - 
+Input edges : 13  
+Output edges : 83  
+
 Edges
 -----
 
-Edge 12 from 16 to 17: Identity layer
+Edge 12 from 16 to 17: Fully connected layer
 
-Edge 13 from 17 to 18: Identity layer
+Edge 13 from 17 to 95: Identity layer
 
 Edge 14 from 18 to 19: Fully connected layer
+
+Edge 83 from 95 to 18: Identity layer
 
 
 

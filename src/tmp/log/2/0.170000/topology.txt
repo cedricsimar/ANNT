@@ -7,10 +7,10 @@ Output edges : 12
 
 Vertex 17: No action - Linear - Flatten
 Input edges : 12  
-Output edges : 13  
+Output edges : 13  73  
 
-Vertex 18: No action - Linear - 
-Input edges : 13  
+Vertex 18: Concatenation - Linear - 
+Input edges : 13  73  
 Output edges : 14  
 
 Vertex 19: No action - Linear - 
@@ -25,6 +25,8 @@ Edge 12 from 16 to 17: Identity layer
 Edge 13 from 17 to 18: Identity layer
 
 Edge 14 from 18 to 19: Fully connected layer
+
+Edge 73 from 17 to 18: Identity layer
 
 
 
