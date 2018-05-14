@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 48: No action - Linear - 
+Input edges : 
+Output edges : 36  
+
+Vertex 49: No action - Linear - Flatten
+Input edges : 36  
+Output edges : 37  
+
+Vertex 50: No action - Linear - 
+Input edges : 37  
+Output edges : 38  
+
+Vertex 51: No action - Linear - 
+Input edges : 38  
+Output edges : 
+
+Edges
+-----
+
+Edge 36 from 48 to 49: Identity layer
+
+Edge 37 from 49 to 50: Identity layer
+
+Edge 38 from 50 to 51: Fully connected layer
+
+
+
+Input ID: 48
+Output ID: 51

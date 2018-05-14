@@ -170,6 +170,7 @@ class GeneticAlgorithm(object):
             # sess = tf.Session(graph=nn.get_graph())
             sess.run(tf.global_variables_initializer())
             # nn.sess.run(tf.initialize_local_variables())
+            sess.graph.finalize()
 
             for training_step in range(Settings.TRAINING_STEPS):
                 

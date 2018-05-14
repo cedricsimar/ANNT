@@ -116,7 +116,7 @@
         "value": 64
     },
     "ALLOWED_UNITS": {
-        "desc": "Allowed units for fully connected layers (Edge)",
+        "desc": "Allowed units for fully connected layers (Edge) Default: [64, 128, 256, 512]",
         "value": [64, 128, 256, 512]
     },
     "DEFAULT_KERNELS": {
