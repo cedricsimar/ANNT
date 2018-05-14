@@ -17,11 +17,11 @@
     },
     "TRAINING_STEPS": {
         "desc": "Number of training steps per individual (120 default: 600, paper: 25.600)",
-        "value": 1
+        "value": 50
     },
     "N_BEST_CANDIDATES": {
         "desc": "Number of best candidates that will constitute a major basis of the next generation",
-        "value": 3
+        "value": 5
     },
     "MAX_BREEDING_ATTEMPTS": {
         "desc": "Maximum number of breeding attemps between two parents",
@@ -29,7 +29,7 @@
     },
     "EVALUATION_RATE": {
         "desc": "Number of steps before evaluating the network performances (default: 5)",
-        "value": 5
+        "value": 10
     },
     "LINEAR": {
         "desc": "Representation of the linear activation function (Vertex)",
@@ -160,7 +160,7 @@
         "value": 0.9
     },
     "LEARNING_RATE": {
-        "desc": "Optimizer learning rate",
-        "value": 0.001
+        "desc": "Optimizer learning rate (default: 0.001)",
+        "value": 0.01
     }
 }

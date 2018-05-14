@@ -21,7 +21,6 @@ class Mutation:
     def mutate(self):
 
         # mutate the dna 
-        # for _ in range(self.mutations_per_generation):
         has_mutated = True
 
         if random() <= Settings.MUTATION_PROBABILITY:
@@ -38,12 +37,7 @@ class Mutation:
                 mutation_keys.remove(mutation)
 
                 # try the mutation
-                print("Trying mutation:", mutation)
                 has_mutated = self.mutations[mutation]()
-                if(has_mutated):
-                    print("Mutation completed")
-                else:
-                    print("Mutation failed")
 
         return (self.dna)
         

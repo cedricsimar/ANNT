@@ -15,11 +15,6 @@ class Cross_Over:
         self.parent_1 = deepcopy(parent_1)
         self.parent_2 = deepcopy(parent_2)
 
-        # assert(self.parent_1.input_vertex_id in self.parent_1.vertices)
-        # assert(self.parent_2.input_vertex_id in self.parent_2.vertices)
-        # assert(self.parent_1.output_vertex_id in self.parent_1.vertices)
-        # assert(self.parent_2.output_vertex_id in self.parent_2.vertices)
-
 
     def breed(self):
 
@@ -111,12 +106,6 @@ class Cross_Over:
         print("offspring 1 : input_id " + str(offspring_1.input_vertex_id) + " output_id " + str(offspring_1.output_vertex_id))
         print("offspring 2 : input_id " + str(offspring_2.input_vertex_id) + " output_id " + str(offspring_2.output_vertex_id))
         print("**************************")
-
-        offspring_1.mama = self.parent_1
-        offspring_1.papa = self.parent_2
-
-        offspring_2.mama = self.parent_1
-        offspring_2.papa = self.parent_2
 
         return(offspring_1, offspring_2)
 
