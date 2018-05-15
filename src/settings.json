@@ -33,7 +33,7 @@
     },
     "TRAINING_STEPS": {
         "desc": "2560 Number of training steps per individual (debug: 200, default: 2560, paper: 25.600)",
-        "value": 2560
+        "value": 5120
     },
     "POPULATION_SIZE": {
         "desc": "Number of individuals in the population",
@@ -60,7 +60,7 @@
         "value": 160
     },
     "MAX_TF_ATTEMPTS": {
-        "desc": "Number of steps before evaluating the network performances (default: 5)",
+        "desc": "Number of steps before evaluating the network performances (default: 20)",
         "value": 20
     },
     "LINEAR": {
