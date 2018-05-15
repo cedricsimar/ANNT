@@ -23,7 +23,7 @@ class DNA:
         self.vertices = {}
         self.edges = {}
 
-        self.num_fully_connected_layers = 0 # limit to 2 FC to limit computation time
+        # self.num_fully_connected_layers = 0 # limit to 2 FC to limit computation time
 
 
     def __lt__(self, dna2):

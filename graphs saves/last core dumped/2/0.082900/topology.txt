@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 188: No action - Linear - 
+Input edges : 
+Output edges : 141  
+
+Vertex 189: No action - Linear - Flatten
+Input edges : 203  
+Output edges : 142  
+
+Vertex 22: No action - Linear - 
+Input edges : 142  
+Output edges : 16  
+
+Vertex 23: No action - Linear - 
+Input edges : 17  
+Output edges : 
+
+Vertex 228: No action - ReLu - 
+Input edges : 141  
+Output edges : 203  
+
+Edges
+-----
+
+Edge 141 from 188 to 228: Identity layer
+
+Edge 142 from 189 to 22: Identity layer
+
+Edge 17 from 22 to 23: Fully connected layer
+
+Edge 203 from 228 to 189: Identity layer
+
+
+
+Input ID: 188
+Output ID: 23

@@ -19,6 +19,10 @@
         "desc": "Path of the models folder",
         "value": "./models/"
     },
+    "CHECKPOINT_PATH": {
+        "desc": "Path of the checkpoint folder",
+        "value": "./checkpoint/"
+    },
     "MUTATIONS_PER_BREEDING": {
         "desc": "Number of mutations that occurs on an individual during one breeding phase",
         "value": 1
@@ -37,7 +41,7 @@
     },
     "MAX_GENERATIONS": {
         "desc": "Maximum number of generations to evolve",
-        "value": 50
+        "value": 110
     },
     "MAX_TRAINABLE_PARAMETERS": {
         "desc": "Maximum number of trainable parameters ",
@@ -178,6 +182,10 @@
     "MINIBATCH_SIZE": {
         "desc": "(default: 100) Number of training cases over which each stochastic gradient descent (SGD) update is computed",
         "value": 50
+    },
+    "TEST_BATCH_SIZE": {
+        "desc": "Number of test cases used to evaluate the model (limited to avoid std::bad_alloc error while running out of memory)",
+        "value": 5000
     },
     "NORMALIZATION_EPSILON": {
         "desc": "Epsilon used in batch normalization",

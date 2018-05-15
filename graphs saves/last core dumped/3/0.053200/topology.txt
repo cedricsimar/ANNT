@@ -1,0 +1,52 @@
+Vertices
+--------
+
+Vertex 20: No action - Linear - 
+Input edges : 
+Output edges : 15  
+
+Vertex 21: No action - Linear - Flatten
+Input edges : 15  
+Output edges : 148  
+
+Vertex 198: No action - Linear - 
+Input edges : 148  
+Output edges : 10  217  
+
+Vertex 216: No action - ReLu - Dropout - 
+Input edges : 10  
+Output edges : 177  
+
+Vertex 14: Concatenation - Linear - 
+Input edges : 177  217  
+Output edges : 192  
+
+Vertex 189: No action - Linear - Flatten
+Input edges : 192  
+Output edges : 5  
+
+Vertex 7: No action - Linear - 
+Input edges : 5  
+Output edges : 
+
+Edges
+-----
+
+Edge 15 from 20 to 21: Identity layer
+
+Edge 148 from 21 to 198: Fully connected layer
+
+Edge 10 from 198 to 216: Identity layer
+
+Edge 177 from 216 to 14: Identity layer
+
+Edge 192 from 14 to 189: Identity layer
+
+Edge 5 from 189 to 7: Fully connected layer
+
+Edge 217 from 198 to 14: Fully connected layer
+
+
+
+Input ID: 20
+Output ID: 7

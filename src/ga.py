@@ -3,6 +3,8 @@ from settings import Settings
 from exceptions import NoBridgeException, SaveMyLaptopException
 from random import randint
 from copy import deepcopy
+import os
+import pickle
 
 from dna import DNA
 from mutation import Mutation
@@ -24,16 +26,19 @@ class GeneticAlgorithm(object):
 
         self.mnist = input_data.read_data_sets("MNIST_data", one_hot=True)
         
-        self.validation_data = reshape_mnist_images(self.mnist.test.images)
-        self.validation_labels = self.mnist.test.labels
-
         self.population = []
         self.fitness = []
         
         self.best_ever_fitness = 1
         self.best_generations_fitness = []
 
-        self.create_initial_population()
+        # if there is a check point, load it, otherwise start with an initial population
+        self.start_generation = len(os.listdir(Settings.CHECKPOINT_PATH))
+
+        if(self.start_generation):
+            self.load_last_saved_generation()
+        else:
+            self.create_initial_population()
 
 
     def evolve(self, num_generations):
@@ -42,7 +47,7 @@ class GeneticAlgorithm(object):
         Evolve the population for a fixed number of generations
         """
 
-        for gen in range(num_generations):
+        for gen in range(self.start_generation, num_generations):
 
             self.generation += 1
             print("Evolving generation " + str(self.generation))
@@ -97,6 +102,9 @@ class GeneticAlgorithm(object):
             else:
                 self.mutations_per_breeding = max(1, self.mutations_per_breeding - 1)
             
+            # save generation checkpoint
+            self.save_generation_checkpoint()
+            
             print("\n ===============================================")
             print("\n ============== End of generation ==============")
             print("\nFitness history through generations :", self.best_generations_fitness)
@@ -104,6 +112,7 @@ class GeneticAlgorithm(object):
             print("The best individual so far is from generation", self.best_generations_fitness.index(best_so_far),
                   "with a fitness of ", best_so_far)
             print("\n ===============================================")
+
             
 
     def attempt_breeding(self, individual_i, individual_j):
@@ -202,11 +211,15 @@ class GeneticAlgorithm(object):
                     images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
                     images = reshape_mnist_images(images)
 
-                    sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
+                    sess.run(nn.optimize, {nn.input: images, nn.labels: labels, nn.is_training: True})
 
                     # performance evaluation every few training steps
                     if not training_step % Settings.EVALUATION_RATE:
-                        summary, validation_error = sess.run([merged_summaries, nn.prediction_error], {nn.input: self.validation_data, nn.labels: self.validation_labels})
+                        
+                        test_images, test_labels = self.mnist.test.next_batch(Settings.TEST_BATCH_SIZE)
+                        test_images = reshape_mnist_images(test_images)
+
+                        summary, validation_error = sess.run([merged_summaries, nn.prediction_error], {nn.input: test_images, nn.labels: test_labels, nn.is_training: False})
                         writer.add_summary(summary, training_step)
                         print('Test error {:6.2f}%'.format(100 * validation_error))
                         best_validation_error = min(best_validation_error, validation_error)
@@ -245,5 +258,57 @@ class GeneticAlgorithm(object):
             self.population.append(individual_dna)
             self.fitness.append(individual_fitness)
 
-        # they are all the same primitive networks so the choice doesn't matter much
-        self.best_generations_fitness.append(self.fitness[0])
+        self.best_generations_fitness.append(min(self.fitness))
+
+
+    def load_last_saved_generation(self):
+
+        print("Loading generation", self.start_generation, "from checkpoint..  ", end='')
+
+        last_checkpoint_path = Settings.CHECKPOINT_PATH + str(self.start_generation) + "/"
+
+        # load the population list
+        population_file = open(last_checkpoint_path + "population.pickle", "rb")
+        self.population = pickle.load(population_file)
+        population_file.close()
+
+        # load the fitness list
+        fitness_file = open(last_checkpoint_path + "fitness.pickle", "rb")
+        self.fitness = pickle.load(fitness_file)
+        fitness_file.close()
+
+        # load the best generations fitness list
+        best_fitness_file = open(last_checkpoint_path + "best_fitness.pickle", "rb")
+        self.best_generations_fitness = pickle.load(best_fitness_file)
+        best_fitness_file.close()
+
+        # restore generation number
+        self.generation = self.start_generation
+
+        print("done.")
+    
+
+    def save_generation_checkpoint(self):
+
+        save_path = Settings.CHECKPOINT_PATH + str(self.generation) + "/"
+        os.mkdir(save_path)
+
+        print("Saving generation", self.generation, "in the checkpoint folder..  ", end='')
+
+        # save the population list
+        population_file = open(save_path + "population.pickle", "wb")
+        pickle.dump(self.population, population_file)
+        population_file.close()
+
+        # save the fitness list
+        fitness_file = open(save_path + "fitness.pickle", "wb")
+        pickle.dump(self.fitness, fitness_file)
+        fitness_file.close()
+
+        # save the best generations fitness list
+        best_fitness_file = open(save_path + "best_fitness.pickle", "wb")
+        pickle.dump(self.best_generations_fitness, best_fitness_file)
+        best_fitness_file.close()
+
+        print("done.")
+

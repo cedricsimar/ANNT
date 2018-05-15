@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 4: No action - Linear - 
+Input edges : 
+Output edges : 3  
+
+Vertex 5: No action - Linear - Flatten
+Input edges : 161  
+Output edges : 107  
+
+Vertex 143: No action - Linear - 
+Input edges : 107  
+Output edges : 
+
+Vertex 206: No action - Linear - 
+Input edges : 3  
+Output edges : 161  
+
+Edges
+-----
+
+Edge 3 from 4 to 206: Identity layer
+
+Edge 107 from 5 to 143: Fully connected layer
+
+Edge 161 from 206 to 5: Identity layer
+
+
+
+Input ID: 4
+Output ID: 143

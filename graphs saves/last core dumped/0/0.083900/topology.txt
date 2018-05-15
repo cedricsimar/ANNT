@@ -1,0 +1,64 @@
+Vertices
+--------
+
+Vertex 64: No action - Linear - 
+Input edges : 
+Output edges : 48  
+
+Vertex 65: No action - Linear - Flatten
+Input edges : 48  
+Output edges : 49  
+
+Vertex 66: No action - Linear - 
+Input edges : 49  
+Output edges : 50  
+
+Vertex 67: No action - Linear - 
+Input edges : 50  
+Output edges : 
+
+Edges
+-----
+
+Edge 48 from 64 to 65: Identity layer
+
+Edge 49 from 65 to 66: Identity layer
+
+Edge 50 from 66 to 67: Fully connected layer
+
+
+
+Input ID: 64
+Output ID: 67
+Vertices
+--------
+
+Vertex 188: No action - Linear - 
+Input edges : 
+Output edges : 141  
+
+Vertex 189: No action - Linear - Flatten
+Input edges : 141  
+Output edges : 142  
+
+Vertex 190: No action - Linear - 
+Input edges : 142  
+Output edges : 143  
+
+Vertex 191: No action - Linear - 
+Input edges : 143  
+Output edges : 
+
+Edges
+-----
+
+Edge 141 from 188 to 189: Identity layer
+
+Edge 142 from 189 to 190: Identity layer
+
+Edge 143 from 190 to 191: Fully connected layer
+
+
+
+Input ID: 188
+Output ID: 191

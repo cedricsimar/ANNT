@@ -1,0 +1,44 @@
+Vertices
+--------
+
+Vertex 16: No action - Linear - 
+Input edges : 
+Output edges : 12  
+
+Vertex 17: No action - Linear - Flatten
+Input edges : 263  
+Output edges : 198  
+
+Vertex 5: No action - Linear - Flatten
+Input edges : 198  
+Output edges : 4  
+
+Vertex 6: No action - Linear - 
+Input edges : 4  
+Output edges : 143  
+
+Vertex 191: No action - Linear - 
+Input edges : 143  
+Output edges : 
+
+Vertex 269: No action - Linear - Dropout - 
+Input edges : 12  
+Output edges : 263  
+
+Edges
+-----
+
+Edge 12 from 16 to 269: Convolutional layer
+
+Edge 198 from 17 to 5: Identity layer
+
+Edge 4 from 5 to 6: Identity layer
+
+Edge 143 from 6 to 191: Fully connected layer
+
+Edge 263 from 269 to 17: Identity layer
+
+
+
+Input ID: 16
+Output ID: 191

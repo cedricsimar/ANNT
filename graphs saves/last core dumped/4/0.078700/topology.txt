@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 16: No action - Linear - 
+Input edges : 
+Output edges : 12  
+
+Vertex 17: No action - Linear - Dropout - Flatten
+Input edges : 342  
+Output edges : 11  
+
+Vertex 15: No action - Linear - 
+Input edges : 11  
+Output edges : 
+
+Vertex 315: No action - Linear - Dropout - 
+Input edges : 343  
+Output edges : 342  
+
+Vertex 316: No action - Linear - 
+Input edges : 12  
+Output edges : 343  
+
+Edges
+-----
+
+Edge 12 from 16 to 316: Convolutional layer
+
+Edge 11 from 17 to 15: Fully connected layer
+
+Edge 342 from 315 to 17: Identity layer
+
+Edge 343 from 316 to 315: Identity layer
+
+
+
+Input ID: 16
+Output ID: 15

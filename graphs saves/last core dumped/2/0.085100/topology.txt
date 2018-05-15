@@ -1,0 +1,36 @@
+Vertices
+--------
+
+Vertex 48: No action - Linear - 
+Input edges : 
+Output edges : 36  165  
+
+Vertex 49: Sum - Linear - Flatten
+Input edges : 36  165  
+Output edges : 37  178  
+
+Vertex 50: Sum - Linear - 
+Input edges : 37  178  
+Output edges : 134  
+
+Vertex 179: No action - Linear - 
+Input edges : 134  
+Output edges : 
+
+Edges
+-----
+
+Edge 36 from 48 to 49: Identity layer
+
+Edge 165 from 48 to 49: Identity layer
+
+Edge 37 from 49 to 50: Identity layer
+
+Edge 134 from 50 to 179: Fully connected layer
+
+Edge 178 from 49 to 50: Identity layer
+
+
+
+Input ID: 48
+Output ID: 179

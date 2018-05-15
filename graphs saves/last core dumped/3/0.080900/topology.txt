@@ -1,0 +1,72 @@
+Vertices
+--------
+
+Vertex 188: No action - Linear - 
+Input edges : 
+Output edges : 290  291  
+
+Vertex 189: Sum - Linear - Flatten
+Input edges : 290  291  
+Output edges : 104  
+
+Vertex 139: No action - Linear - 
+Input edges : 104  
+Output edges : 
+
+Edges
+-----
+
+Edge 104 from 189 to 139: Fully connected layer
+
+Edge 290 from 188 to 189: Fully connected layer
+
+Edge 291 from 188 to 189: Fully connected layer
+
+
+
+Input ID: 188
+Output ID: 139
+Vertices
+--------
+
+Vertex 20: No action - Linear - 
+Input edges : 
+Output edges : 15  
+
+Vertex 21: No action - Linear - Flatten
+Input edges : 15  
+Output edges : 16  
+
+Vertex 22: No action - Linear - 
+Input edges : 16  
+Output edges : 162  
+
+Vertex 9: No action - Linear - Flatten
+Input edges : 297  
+Output edges : 11  
+
+Vertex 15: No action - Linear - 
+Input edges : 11  
+Output edges : 
+
+Vertex 289: No action - ReLu - 
+Input edges : 162  
+Output edges : 297  
+
+Edges
+-----
+
+Edge 15 from 20 to 21: Fully connected layer
+
+Edge 16 from 21 to 22: Identity layer
+
+Edge 162 from 22 to 289: Identity layer
+
+Edge 11 from 9 to 15: Fully connected layer
+
+Edge 297 from 289 to 9: Identity layer
+
+
+
+Input ID: 20
+Output ID: 15

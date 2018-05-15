@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 0: No action - Linear - 
+Input edges : 
+Output edges : 0  
+
+Vertex 1: No action - Linear - Flatten
+Input edges : 152  
+Output edges : 11  
+
+Vertex 15: No action - Linear - 
+Input edges : 11  
+Output edges : 
+
+Vertex 202: No action - ReLu - Dropout - 
+Input edges : 0  
+Output edges : 152  
+
+Edges
+-----
+
+Edge 0 from 0 to 202: Identity layer
+
+Edge 11 from 1 to 15: Fully connected layer
+
+Edge 152 from 202 to 1: Identity layer
+
+
+
+Input ID: 0
+Output ID: 15

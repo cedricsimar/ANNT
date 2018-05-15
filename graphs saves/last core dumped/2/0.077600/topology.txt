@@ -1,0 +1,26 @@
+Vertices
+--------
+
+Vertex 16: No action - Linear - 
+Input edges : 
+Output edges : 12  
+
+Vertex 17: No action - Linear - Flatten
+Input edges : 12  
+Output edges : 116  
+
+Vertex 155: No action - Linear - 
+Input edges : 116  
+Output edges : 
+
+Edges
+-----
+
+Edge 12 from 16 to 17: Convolutional layer
+
+Edge 116 from 17 to 155: Fully connected layer
+
+
+
+Input ID: 16
+Output ID: 155

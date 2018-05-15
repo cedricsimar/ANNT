@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 76: No action - Linear - 
+Input edges : 
+Output edges : 57  
+
+Vertex 77: No action - Linear - Flatten
+Input edges : 57  
+Output edges : 58  
+
+Vertex 78: No action - Linear - 
+Input edges : 58  
+Output edges : 131  
+
+Vertex 175: No action - Linear - 
+Input edges : 131  
+Output edges : 
+
+Edges
+-----
+
+Edge 57 from 76 to 77: Identity layer
+
+Edge 58 from 77 to 78: Identity layer
+
+Edge 131 from 78 to 175: Fully connected layer
+
+
+
+Input ID: 76
+Output ID: 175

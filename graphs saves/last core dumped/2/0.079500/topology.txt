@@ -1,0 +1,76 @@
+Vertices
+--------
+
+Vertex 12: No action - Linear - 
+Input edges : 
+Output edges : 9  
+
+Vertex 13: No action - Linear - Flatten
+Input edges : 9  
+Output edges : 10  
+
+Vertex 2: No action - Linear - 
+Input edges : 10  
+Output edges : 37  
+
+Vertex 50: No action - Linear - 
+Input edges : 37  
+Output edges : 13  
+
+Vertex 18: No action - Linear - 
+Input edges : 13  
+Output edges : 14  
+
+Vertex 19: No action - Linear - 
+Input edges : 14  
+Output edges : 
+
+Edges
+-----
+
+Edge 9 from 12 to 13: Fully connected layer
+
+Edge 10 from 13 to 2: Identity layer
+
+Edge 37 from 2 to 50: Identity layer
+
+Edge 13 from 50 to 18: Identity layer
+
+Edge 14 from 18 to 19: Fully connected layer
+
+
+
+Input ID: 12
+Output ID: 19
+Vertices
+--------
+
+Vertex 12: No action - Linear - 
+Input edges : 
+Output edges : 9  
+
+Vertex 13: No action - ReLu - Flatten
+Input edges : 9  
+Output edges : 4  
+
+Vertex 18: No action - Linear - 
+Input edges : 4  
+Output edges : 14  
+
+Vertex 19: No action - Linear - 
+Input edges : 14  
+Output edges : 
+
+Edges
+-----
+
+Edge 9 from 12 to 13: Fully connected layer
+
+Edge 4 from 13 to 18: Identity layer
+
+Edge 14 from 18 to 19: Fully connected layer
+
+
+
+Input ID: 12
+Output ID: 19

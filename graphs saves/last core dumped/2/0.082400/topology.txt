@@ -1,0 +1,44 @@
+Vertices
+--------
+
+Vertex 100: No action - Linear - 
+Input edges : 
+Output edges : 75  
+
+Vertex 211: No action - ReLu - Dropout - 
+Input edges : 75  
+Output edges : 169  
+
+Vertex 101: No action - Linear - Flatten
+Input edges : 169  
+Output edges : 76  
+
+Vertex 102: No action - Linear - 
+Input edges : 76  
+Output edges : 103  
+
+Vertex 138: No action - Linear - 
+Input edges : 103  
+Output edges : 38  
+
+Vertex 51: No action - Linear - 
+Input edges : 38  
+Output edges : 
+
+Edges
+-----
+
+Edge 75 from 100 to 211: Identity layer
+
+Edge 169 from 211 to 101: Identity layer
+
+Edge 76 from 101 to 102: Identity layer
+
+Edge 103 from 102 to 138: Identity layer
+
+Edge 38 from 138 to 51: Fully connected layer
+
+
+
+Input ID: 100
+Output ID: 51

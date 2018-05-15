@@ -1,0 +1,58 @@
+Vertices
+--------
+
+Vertex 20: No action - Linear - 
+Input edges : 
+Output edges : 15  338  
+
+Vertex 260: Sum - Linear - Dropout - 
+Input edges : 15  338  
+Output edges : 250  
+
+Vertex 261: No action - ReLu - 
+Input edges : 340  
+Output edges : 251  
+
+Vertex 21: No action - Linear - Flatten
+Input edges : 341  
+Output edges : 2  
+
+Vertex 3: No action - Linear - 
+Input edges : 2  
+Output edges : 
+
+Vertex 312: No action - Linear - 
+Input edges : 251  
+Output edges : 339  
+
+Vertex 313: No action - ReLu - Dropout - 
+Input edges : 250  
+Output edges : 340  
+
+Vertex 314: No action - Linear - Dropout - 
+Input edges : 339  
+Output edges : 341  
+
+Edges
+-----
+
+Edge 15 from 20 to 260: Convolutional layer
+
+Edge 250 from 260 to 313: Identity layer
+
+Edge 251 from 261 to 312: Identity layer
+
+Edge 2 from 21 to 3: Fully connected layer
+
+Edge 338 from 20 to 260: Convolutional layer
+
+Edge 339 from 312 to 314: Identity layer
+
+Edge 340 from 313 to 261: Identity layer
+
+Edge 341 from 314 to 21: Identity layer
+
+
+
+Input ID: 20
+Output ID: 3

@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 16: No action - Linear - 
+Input edges : 
+Output edges : 12  
+
+Vertex 17: No action - Linear - Flatten
+Input edges : 12  
+Output edges : 251  
+
+Vertex 21: No action - Linear - Flatten
+Input edges : 251  
+Output edges : 11  
+
+Vertex 15: No action - Linear - 
+Input edges : 11  
+Output edges : 
+
+Edges
+-----
+
+Edge 12 from 16 to 17: Identity layer
+
+Edge 251 from 17 to 21: Fully connected layer
+
+Edge 11 from 21 to 15: Fully connected layer
+
+
+
+Input ID: 16
+Output ID: 15

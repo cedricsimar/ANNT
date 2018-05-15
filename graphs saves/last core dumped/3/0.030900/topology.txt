@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 20: No action - Linear - 
+Input edges : 
+Output edges : 15  
+
+Vertex 21: No action - Linear - Flatten
+Input edges : 251  
+Output edges : 11  
+
+Vertex 15: No action - Linear - 
+Input edges : 11  
+Output edges : 
+
+Vertex 260: No action - Linear - Dropout - 
+Input edges : 15  
+Output edges : 250  
+
+Vertex 261: No action - ReLu - 
+Input edges : 250  
+Output edges : 251  
+
+Edges
+-----
+
+Edge 15 from 20 to 260: Convolutional layer
+
+Edge 11 from 21 to 15: Fully connected layer
+
+Edge 250 from 260 to 261: Identity layer
+
+Edge 251 from 261 to 21: Identity layer
+
+
+
+Input ID: 20
+Output ID: 15

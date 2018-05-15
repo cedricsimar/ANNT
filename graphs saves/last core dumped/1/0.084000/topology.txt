@@ -1,0 +1,108 @@
+Vertices
+--------
+
+Vertex 4: No action - Linear - 
+Input edges : 
+Output edges : 3  
+
+Vertex 5: No action - Linear - Flatten
+Input edges : 3  
+Output edges : 4  
+
+Vertex 2: No action - Linear - 
+Input edges : 4  
+Output edges : 2  
+
+Vertex 3: No action - Linear - 
+Input edges : 2  
+Output edges : 
+
+Edges
+-----
+
+Edge 3 from 4 to 5: Identity layer
+
+Edge 4 from 5 to 2: Identity layer
+
+Edge 2 from 2 to 3: Fully connected layer
+
+
+
+Input ID: 4
+Output ID: 3
+Vertices
+--------
+
+Vertex 16: No action - Linear - 
+Input edges : 
+Output edges : 12  
+
+Vertex 17: No action - Linear - Flatten
+Input edges : 12  
+Output edges : 7  
+
+Vertex 10: No action - Linear - 
+Input edges : 160  
+Output edges : 8  
+
+Vertex 11: No action - Linear - 
+Input edges : 8  
+Output edges : 
+
+Vertex 205: No action - ReLu - Dropout - 
+Input edges : 7  
+Output edges : 160  
+
+Edges
+-----
+
+Edge 12 from 16 to 17: Identity layer
+
+Edge 7 from 17 to 205: Identity layer
+
+Edge 8 from 10 to 11: Fully connected layer
+
+Edge 160 from 205 to 10: Identity layer
+
+
+
+Input ID: 16
+Output ID: 11
+Vertices
+--------
+
+Vertex 176: No action - Linear - 
+Input edges : 
+Output edges : 132  
+
+Vertex 177: No action - Linear - Flatten
+Input edges : 132  
+Output edges : 133  
+
+Vertex 178: No action - Linear - 
+Input edges : 133  
+Output edges : 142  
+
+Vertex 190: No action - Linear - 
+Input edges : 142  
+Output edges : 143  
+
+Vertex 191: No action - Linear - 
+Input edges : 143  
+Output edges : 
+
+Edges
+-----
+
+Edge 132 from 176 to 177: Identity layer
+
+Edge 133 from 177 to 178: Identity layer
+
+Edge 142 from 178 to 190: Identity layer
+
+Edge 143 from 190 to 191: Fully connected layer
+
+
+
+Input ID: 176
+Output ID: 191

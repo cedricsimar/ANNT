@@ -44,12 +44,13 @@ class NN:
         # creating input placeholder
         if self.input_dim == 1:
             # 1D input
-            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0]])
+            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0]], name="input")
         elif self.input_dim == 2:
             # 2D input
-            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0], self.dna.input_shape[1]])
+            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0], self.dna.input_shape[1]], name="input")
 
-        self.labels = tf.placeholder(tf.float32, [None, self.dna.output_shape])
+        self.labels = tf.placeholder(tf.float32, [None, self.dna.output_shape], name="labels")
+        self.is_training = tf.placeholder(tf.bool, name="is_training")
 
         # Network settings
         self.norm_eps = Settings.NORMALIZATION_EPSILON
@@ -170,7 +171,7 @@ class NN:
 
                     # dropout
                     if v.dropout == Settings.USE_DROPOUT:
-                        tensor = tf.layers.dropout(inputs=tensor, rate=Settings.DROPOUT_RATE)
+                        tensor = tf.layers.dropout(inputs=tensor, rate=Settings.DROPOUT_RATE, training=self.is_training)
 
                     #################################################
                     
