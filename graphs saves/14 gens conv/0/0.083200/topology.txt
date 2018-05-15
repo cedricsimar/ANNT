@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 180: No action - Linear - 
+Input edges : 
+Output edges : 135  
+
+Vertex 181: No action - Linear - Flatten
+Input edges : 135  
+Output edges : 136  
+
+Vertex 182: No action - Linear - 
+Input edges : 136  
+Output edges : 137  
+
+Vertex 183: No action - Linear - 
+Input edges : 137  
+Output edges : 
+
+Edges
+-----
+
+Edge 135 from 180 to 181: Identity layer
+
+Edge 136 from 181 to 182: Identity layer
+
+Edge 137 from 182 to 183: Fully connected layer
+
+
+
+Input ID: 180
+Output ID: 183

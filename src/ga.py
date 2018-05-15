@@ -10,16 +10,17 @@ from cross_over import Cross_Over
 from nn import NN
 from utils import reshape_mnist_images
 
+import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
 class GeneticAlgorithm(object):
 
-    def __init__(self, population_size, mutations_per_generation):
+    def __init__(self, population_size):
         
         self.generation = 0
         self.population_size = population_size
-        self.mutations_per_generation = mutations_per_generation
+        self.mutations_per_breeding = Settings.MUTATIONS_PER_BREEDING
 
         self.mnist = input_data.read_data_sets("MNIST_data", one_hot=True)
         
@@ -27,10 +28,10 @@ class GeneticAlgorithm(object):
         self.validation_labels = self.mnist.test.labels
 
         self.population = []
-        self.neural_networks = []
         self.fitness = []
         
-        self.best_fitness_score = 0
+        self.best_ever_fitness = 1
+        self.best_generations_fitness = []
 
         self.create_initial_population()
 
@@ -47,15 +48,13 @@ class GeneticAlgorithm(object):
             print("Evolving generation " + str(self.generation))
 
             self.next_generation_dna = []
-            self.next_generation_nn = []
             self.next_generation_fitness = []
 
             # save the three best individuals that go through the next generation unchanged
-            # (produces 3 offsprings)
+            # (produces N_BEST_CANDIDATES offsprings)
             for best_i in range(Settings.N_BEST_CANDIDATES):
 
                 self.next_generation_dna.append(self.population[best_i])
-                self.next_generation_nn.append(self.neural_networks[best_i])
                 self.next_generation_fitness.append(self.fitness[best_i])
 
             # breed the three best individuals together
@@ -77,28 +76,13 @@ class GeneticAlgorithm(object):
                 other_i = randint(0, self.population_size - 1)
                 other_j = randint(0, self.population_size - 1)
                 self.attempt_breeding(other_i, other_j)
-
-
-            # train every non-trained neural network of the next generation
-            # on the MNIST dataset and store it's best fitness score
-
-            # for individual_i in range(Settings.N_BEST_CANDIDATES, self.population_size):
-
-            #     # train the neural network and store the individual's fitness score
-            #     individual_fitness = self.train_network(self.next_generation_nn[individual_i])
-            #     self.next_generation_fitness[individual_i] = individual_fitness
             
             # sort the next generation individuals by fitness
-            self.next_generation_fitness, self.next_generation_dna, self.next_generation_nn = (list(t) for t in zip(*sorted(zip(self.next_generation_fitness, self.next_generation_dna, self.next_generation_nn))))
+            self.next_generation_fitness, self.next_generation_dna = (list(t) for t in zip(*sorted(zip(self.next_generation_fitness, self.next_generation_dna))))
 
             # update the population for the next generation
             self.population = self.next_generation_dna
-            self.neural_networks = self.next_generation_nn
             self.fitness = self.next_generation_fitness
-
-            print("----------------------------------")
-            print(len(self.population), len(self.neural_networks), len(self.fitness))
-            print("----------------------------------")
 
 
     def attempt_breeding(self, individual_i, individual_j):
@@ -117,6 +101,7 @@ class GeneticAlgorithm(object):
 
         successful_breedings = 0
         breeding_attempts = 0
+        
         while(successful_breedings < 2 and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
             
             try:
@@ -132,26 +117,24 @@ class GeneticAlgorithm(object):
             
                 mutated_offspring = Mutation(offspring).mutate()
 
-                # Train the crossed-mutated graphs on the spot
+                # Build and train the crossed-mutated graphs on the spot
                 if(successful_breedings < 2):
                         
                     try:
-                        mutated_offspring_nn = NN(mutated_offspring)
-                        mutated_offspring_fitness = self.train_network(mutated_offspring_nn)
+                        mutated_offspring_fitness = self.build_and_train_network(mutated_offspring)
+
                         self.next_generation_dna.append(mutated_offspring)
-                        self.next_generation_nn.append(mutated_offspring_nn)
                         self.next_generation_fitness.append(mutated_offspring_fitness)
                         successful_breedings += 1
 
                     except Exception as e:
                         print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
                     
-                    tf.reset_default_graph()
-      
+          
         return(successful_breedings)
 
 
-    def train_network(self, nn):
+    def build_and_train_network(self, individual_dna):
 
         """
         Train the Neural Network for a fixed number of steps and regularly evaluate
@@ -160,41 +143,52 @@ class GeneticAlgorithm(object):
 
         best_validation_error = 1
 
-        print("==========================================")
-        print("Training the following DNA: \n")
-        print(nn.dna)
-
-        with tf.Session() as sess:
+        graph = tf.Graph()
+        with graph.as_default():
                 
-            # sess = tf.Session(graph=nn.get_graph())
-            sess.run(tf.global_variables_initializer())
-            # nn.sess.run(tf.initialize_local_variables())
-            sess.graph.finalize()
+            # build the Neural Network using the mutated dna instance
+            nn = NN(individual_dna)
 
-            for training_step in range(Settings.TRAINING_STEPS):
+            # and train the resulting model
+
+
+            print("==========================================")
+            print("Number of trainable variables : ", end='')
+            print(np.sum([np.prod(v.shape) for v in tf.trainable_variables()]))
+            print("Training the following DNA: \n")
+            print(nn.dna)
+
+            with tf.Session(graph=graph) as sess:
+                    
+                # sess = tf.Session(graph=nn.get_graph())
+                sess.run(tf.global_variables_initializer())
+                # nn.sess.run(tf.initialize_local_variables())
+                sess.graph.finalize()
+
+                for training_step in range(Settings.TRAINING_STEPS):
+                    
+                    # training step
+                    images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
+                    images = reshape_mnist_images(images)
+
+                    sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
+
+                    # performance evaluation every few training steps
+                    if not training_step % Settings.EVALUATION_RATE:
+                        validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels: self.validation_labels})
+                        print('Test error {:6.2f}%'.format(100 * validation_error))
+                        best_validation_error = min(best_validation_error, validation_error)
+
+                # save graph logs and dna string
+                log_path = "./tmp/log/" + str(self.generation) + "/" + "{:f}".format(best_validation_error)
                 
-                # training step
-                images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
-                images = reshape_mnist_images(images)
+                writer = tf.summary.FileWriter(log_path, sess.graph)
+                writer.close()
 
-                sess.run(nn.optimize, {nn.input: images, nn.labels: labels})
-
-                # performance evaluation every few training steps
-                if not training_step % Settings.EVALUATION_RATE:
-                    validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels: self.validation_labels})
-                    print('Test error {:6.2f}%'.format(100 * validation_error))
-                    best_validation_error = min(best_validation_error, validation_error)
-
-            # save graph logs and dna string
-            log_path = "./tmp/log/" + str(self.generation) + "/" + "{:f}".format(best_validation_error)
-            
-            writer = tf.summary.FileWriter(log_path, sess.graph)
-            writer.close()
-
-            file_path = log_path + "/topology.txt"
-            with open(file_path, 'w') as topo_file:
-                topo_file.write(nn.dna.__str__())
-        
+                file_path = log_path + "/topology.txt"
+                with open(file_path, 'w') as topo_file:
+                    topo_file.write(nn.dna.__str__())
+         
         print("Training and Saving complete !")
 
         return(best_validation_error)
@@ -212,11 +206,7 @@ class GeneticAlgorithm(object):
             individual_dna = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
             individual_dna.create_primitive_structure()
 
-            individual_nn = NN(individual_dna)
-            individual_fitness = self.train_network(individual_nn)
-            
-            tf.reset_default_graph()
+            individual_fitness = self.build_and_train_network(individual_dna)
 
             self.population.append(individual_dna)
-            self.neural_networks.append(individual_nn)
             self.fitness.append(individual_fitness)

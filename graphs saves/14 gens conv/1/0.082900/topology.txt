@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 144: No action - Linear - 
+Input edges : 
+Output edges : 108  
+
+Vertex 145: No action - Linear - Flatten
+Input edges : 108  
+Output edges : 109  
+
+Vertex 146: No action - Linear - 
+Input edges : 109  
+Output edges : 26  
+
+Vertex 35: No action - Linear - 
+Input edges : 26  
+Output edges : 
+
+Edges
+-----
+
+Edge 108 from 144 to 145: Identity layer
+
+Edge 109 from 145 to 146: Identity layer
+
+Edge 26 from 146 to 35: Fully connected layer
+
+
+
+Input ID: 144
+Output ID: 35

@@ -1,0 +1,26 @@
+Vertices
+--------
+
+Vertex 152: No action - Linear - 
+Input edges : 
+Output edges : 114  
+
+Vertex 153: No action - Linear - Flatten
+Input edges : 114  
+Output edges : 101  
+
+Vertex 135: No action - Linear - 
+Input edges : 101  
+Output edges : 
+
+Edges
+-----
+
+Edge 114 from 152 to 153: Identity layer
+
+Edge 101 from 153 to 135: Fully connected layer
+
+
+
+Input ID: 152
+Output ID: 135

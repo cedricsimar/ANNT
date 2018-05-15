@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 0: No action - Linear - 
+Input edges : 
+Output edges : 0  
+
+Vertex 1: No action - Linear - Flatten
+Input edges : 0  
+Output edges : 142  
+
+Vertex 190: No action - Linear - 
+Input edges : 142  
+Output edges : 143  
+
+Vertex 191: No action - Linear - 
+Input edges : 143  
+Output edges : 
+
+Edges
+-----
+
+Edge 0 from 0 to 1: Identity layer
+
+Edge 142 from 1 to 190: Identity layer
+
+Edge 143 from 190 to 191: Fully connected layer
+
+
+
+Input ID: 0
+Output ID: 191

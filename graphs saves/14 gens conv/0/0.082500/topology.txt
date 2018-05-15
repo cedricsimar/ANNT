@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 104: No action - Linear - 
+Input edges : 
+Output edges : 78  
+
+Vertex 105: No action - Linear - Flatten
+Input edges : 78  
+Output edges : 79  
+
+Vertex 106: No action - Linear - 
+Input edges : 79  
+Output edges : 80  
+
+Vertex 107: No action - Linear - 
+Input edges : 80  
+Output edges : 
+
+Edges
+-----
+
+Edge 78 from 104 to 105: Identity layer
+
+Edge 79 from 105 to 106: Identity layer
+
+Edge 80 from 106 to 107: Fully connected layer
+
+
+
+Input ID: 104
+Output ID: 107

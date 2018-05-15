@@ -1,0 +1,34 @@
+Vertices
+--------
+
+Vertex 4: No action - Linear - 
+Input edges : 
+Output edges : 3  150  
+
+Vertex 5: Sum - Linear - Flatten
+Input edges : 3  150  
+Output edges : 1  
+
+Vertex 2: No action - Linear - 
+Input edges : 1  
+Output edges : 2  
+
+Vertex 3: No action - Linear - 
+Input edges : 2  
+Output edges : 
+
+Edges
+-----
+
+Edge 3 from 4 to 5: Identity layer
+
+Edge 1 from 5 to 2: Identity layer
+
+Edge 2 from 2 to 3: Fully connected layer
+
+Edge 150 from 4 to 5: Identity layer
+
+
+
+Input ID: 4
+Output ID: 3

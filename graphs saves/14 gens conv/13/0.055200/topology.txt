@@ -1,0 +1,48 @@
+Vertices
+--------
+
+Vertex 8: No action - Linear - 
+Input edges : 
+Output edges : 6  109  
+
+Vertex 87: No action - ReLu - 
+Input edges : 6  
+Output edges : 73  
+
+Vertex 9: Sum - Linear - 
+Input edges : 73  109  
+Output edges : 73  
+
+Vertex 145: No action - ReLu - 
+Input edges : 10  
+Output edges : 178  297  
+
+Vertex 14: Concatenation - Linear - 
+Input edges : 178  297  
+Output edges : 11  
+
+Vertex 15: No action - Linear - 
+Input edges : 11  
+Output edges : 
+
+Edges
+-----
+
+Edge 6 from 8 to 87: Convolutional layer
+
+Edge 109 from 8 to 9: Convolutional layer
+
+Edge 73 from 87 to 9: Identity layer
+
+Edge 10 from 9 to 145: Identity layer
+
+Edge 178 from 145 to 14: Identity layer
+
+Edge 11 from 14 to 15: Fully connected layer
+
+Edge 297 from 145 to 14: Identity layer
+
+
+
+Input ID: 8
+Output ID: 15

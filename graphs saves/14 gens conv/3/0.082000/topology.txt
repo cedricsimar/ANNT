@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 32: No action - Linear - 
+Input edges : 
+Output edges : 24  
+
+Vertex 33: No action - Linear - Flatten
+Input edges : 24  
+Output edges : 7  
+
+Vertex 10: No action - Linear - 
+Input edges : 7  
+Output edges : 116  
+
+Vertex 155: No action - Linear - 
+Input edges : 116  
+Output edges : 
+
+Edges
+-----
+
+Edge 24 from 32 to 33: Identity layer
+
+Edge 7 from 33 to 10: Identity layer
+
+Edge 116 from 10 to 155: Fully connected layer
+
+
+
+Input ID: 32
+Output ID: 155

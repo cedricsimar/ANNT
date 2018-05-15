@@ -1,0 +1,34 @@
+Vertices
+--------
+
+Vertex 12: No action - Linear - 
+Input edges : 
+Output edges : 9  158  
+
+Vertex 13: Sum - Linear - Flatten
+Input edges : 9  158  
+Output edges : 7  
+
+Vertex 10: No action - Linear - 
+Input edges : 7  
+Output edges : 5  
+
+Vertex 7: No action - Linear - 
+Input edges : 5  
+Output edges : 
+
+Edges
+-----
+
+Edge 9 from 12 to 13: Identity layer
+
+Edge 158 from 12 to 13: Fully connected layer
+
+Edge 7 from 13 to 10: Fully connected layer
+
+Edge 5 from 10 to 7: Fully connected layer
+
+
+
+Input ID: 12
+Output ID: 7

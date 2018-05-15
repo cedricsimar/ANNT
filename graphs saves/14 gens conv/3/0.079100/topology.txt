@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 32: No action - Linear - 
+Input edges : 
+Output edges : 24  
+
+Vertex 33: No action - Linear - Flatten
+Input edges : 192  
+Output edges : 13  
+
+Vertex 18: No action - Linear - 
+Input edges : 13  
+Output edges : 14  
+
+Vertex 19: No action - Linear - 
+Input edges : 14  
+Output edges : 
+
+Vertex 216: No action - Linear - 
+Input edges : 24  
+Output edges : 192  
+
+Edges
+-----
+
+Edge 24 from 32 to 216: Identity layer
+
+Edge 13 from 33 to 18: Fully connected layer
+
+Edge 14 from 18 to 19: Fully connected layer
+
+Edge 192 from 216 to 33: Identity layer
+
+
+
+Input ID: 32
+Output ID: 19

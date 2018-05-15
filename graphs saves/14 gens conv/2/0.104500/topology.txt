@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 8: No action - Linear - 
+Input edges : 
+Output edges : 6  
+
+Vertex 9: No action - Linear - Flatten
+Input edges : 6  
+Output edges : 1  
+
+Vertex 2: No action - Linear - 
+Input edges : 1  
+Output edges : 1  
+
+Vertex 3: No action - Linear - 
+Input edges : 2  
+Output edges : 
+
+Edges
+-----
+
+Edge 6 from 8 to 9: Convolutional layer
+
+Edge 1 from 9 to 2: Identity layer
+
+Edge 2 from 2 to 3: Fully connected layer
+
+
+
+Input ID: 8
+Output ID: 3

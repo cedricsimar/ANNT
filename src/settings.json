@@ -9,15 +9,31 @@
     },
     "MUTATION_PROBABILITY": {
         "desc": "Probability that a mutation occurs during a mutation phase",
-        "value": 0.99
+        "value": 0.9
+    },
+    "MUTATIONS_PER_BREEDING": {
+        "desc": "Number of mutations that occurs on an individual during one breeding phase",
+        "value": 1
     },
     "NETWORK_SIZE_IMPORTANCE_TO_FITNESS": {
         "desc": "Importance of the network size to compute the fitness of an individual, the more this value, the less network size is important",
         "value": 10
     },
     "TRAINING_STEPS": {
-        "desc": "Number of training steps per individual (120 default: 600, paper: 25.600)",
+        "desc": "2560 Number of training steps per individual (120 default: 600, paper: 25.600)",
+        "value": 2560
+    },
+    "POPULATION_SIZE": {
+        "desc": "Number of individuals in the population",
+        "value": 20
+    },
+    "MAX_GENERATIONS": {
+        "desc": "Maximum number of generations to evolve",
         "value": 50
+    },
+    "MAX_TRAINABLE_PARAMETERS": {
+        "desc": "Maximum number of trainable parameters ",
+        "value": 1200000
     },
     "N_BEST_CANDIDATES": {
         "desc": "Number of best candidates that will constitute a major basis of the next generation",
@@ -29,7 +45,11 @@
     },
     "EVALUATION_RATE": {
         "desc": "Number of steps before evaluating the network performances (default: 5)",
-        "value": 10
+        "value": 160
+    },
+    "MAX_TF_ATTEMPTS": {
+        "desc": "Number of steps before evaluating the network performances (default: 5)",
+        "value": 20
     },
     "LINEAR": {
         "desc": "Representation of the linear activation function (Vertex)",

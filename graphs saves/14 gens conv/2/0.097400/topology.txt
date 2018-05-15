@@ -1,0 +1,40 @@
+Vertices
+--------
+
+Vertex 0: No action - Linear - 
+Input edges : 
+Output edges : 0  
+
+Vertex 1: No action - Linear - Flatten
+Input edges : 0  
+Output edges : 13  72  
+
+Vertex 18: No action - Linear - 
+Input edges : 13  
+Output edges : 16  
+
+Vertex 22: Concatenation - Linear - 
+Input edges : 16  72  
+Output edges : 17  
+
+Vertex 23: No action - Linear - 
+Input edges : 17  
+Output edges : 
+
+Edges
+-----
+
+Edge 0 from 0 to 1: Convolutional layer
+
+Edge 13 from 1 to 18: Identity layer
+
+Edge 72 from 1 to 22: Fully connected layer
+
+Edge 16 from 18 to 22: Identity layer
+
+Edge 17 from 22 to 23: Fully connected layer
+
+
+
+Input ID: 0
+Output ID: 23

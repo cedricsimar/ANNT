@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 132: No action - Linear - 
+Input edges : 
+Output edges : 99  
+
+Vertex 133: No action - Linear - Flatten
+Input edges : 183  
+Output edges : 100  
+
+Vertex 134: No action - Linear - 
+Input edges : 100  
+Output edges : 5  
+
+Vertex 7: No action - Linear - 
+Input edges : 5  
+Output edges : 
+
+Vertex 214: No action - ReLu - 
+Input edges : 99  
+Output edges : 183  
+
+Edges
+-----
+
+Edge 99 from 132 to 214: Identity layer
+
+Edge 100 from 133 to 134: Identity layer
+
+Edge 5 from 134 to 7: Fully connected layer
+
+Edge 183 from 214 to 133: Identity layer
+
+
+
+Input ID: 132
+Output ID: 7

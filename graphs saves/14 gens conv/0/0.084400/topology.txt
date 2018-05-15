@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 168: No action - Linear - 
+Input edges : 
+Output edges : 126  
+
+Vertex 169: No action - Linear - Flatten
+Input edges : 126  
+Output edges : 127  
+
+Vertex 170: No action - Linear - 
+Input edges : 127  
+Output edges : 128  
+
+Vertex 171: No action - Linear - 
+Input edges : 128  
+Output edges : 
+
+Edges
+-----
+
+Edge 126 from 168 to 169: Identity layer
+
+Edge 127 from 169 to 170: Identity layer
+
+Edge 128 from 170 to 171: Fully connected layer
+
+
+
+Input ID: 168
+Output ID: 171

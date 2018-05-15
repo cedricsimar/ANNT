@@ -1,0 +1,26 @@
+Vertices
+--------
+
+Vertex 12: No action - Linear - 
+Input edges : 
+Output edges : 9  
+
+Vertex 13: No action - ReLu - Flatten
+Input edges : 9  
+Output edges : 5  
+
+Vertex 7: No action - Linear - 
+Input edges : 5  
+Output edges : 
+
+Edges
+-----
+
+Edge 9 from 12 to 13: Fully connected layer
+
+Edge 5 from 13 to 7: Fully connected layer
+
+
+
+Input ID: 12
+Output ID: 7

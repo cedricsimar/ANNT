@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 0: No action - Linear - 
+Input edges : 
+Output edges : 0  
+
+Vertex 1: No action - Linear - Flatten
+Input edges : 186  
+Output edges : 127  
+
+Vertex 170: No action - Linear - 
+Input edges : 127  
+Output edges : 128  
+
+Vertex 171: No action - Linear - 
+Input edges : 128  
+Output edges : 
+
+Vertex 215: No action - Linear - 
+Input edges : 0  
+Output edges : 186  
+
+Edges
+-----
+
+Edge 0 from 0 to 215: Identity layer
+
+Edge 127 from 1 to 170: Identity layer
+
+Edge 128 from 170 to 171: Fully connected layer
+
+Edge 186 from 215 to 1: Identity layer
+
+
+
+Input ID: 0
+Output ID: 171

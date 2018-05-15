@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 148: No action - Linear - 
+Input edges : 
+Output edges : 111  
+
+Vertex 149: No action - Linear - Flatten
+Input edges : 111  
+Output edges : 112  
+
+Vertex 150: No action - Linear - 
+Input edges : 112  
+Output edges : 113  
+
+Vertex 151: No action - Linear - 
+Input edges : 113  
+Output edges : 
+
+Edges
+-----
+
+Edge 111 from 148 to 149: Identity layer
+
+Edge 112 from 149 to 150: Identity layer
+
+Edge 113 from 150 to 151: Fully connected layer
+
+
+
+Input ID: 148
+Output ID: 151

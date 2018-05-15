@@ -1,0 +1,5 @@
+*.dat
+*.pyc
+*.swp
+.vscode/
+__pycache__/

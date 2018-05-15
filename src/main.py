@@ -8,8 +8,8 @@ from ga import GeneticAlgorithm
 
 def main():
 
-    GA = GeneticAlgorithm(20, 1)
-    GA.evolve(50)
+    GA = GeneticAlgorithm(Settings.POPULATION_SIZE)
+    GA.evolve(Settings.MAX_GENERATIONS)
 
 
 

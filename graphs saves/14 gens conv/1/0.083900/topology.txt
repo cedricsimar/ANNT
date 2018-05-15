@@ -1,0 +1,26 @@
+Vertices
+--------
+
+Vertex 4: No action - Linear - 
+Input edges : 
+Output edges : 3  
+
+Vertex 5: No action - Linear - Flatten
+Input edges : 3  
+Output edges : 47  
+
+Vertex 63: No action - Linear - 
+Input edges : 47  
+Output edges : 
+
+Edges
+-----
+
+Edge 3 from 4 to 5: Identity layer
+
+Edge 47 from 5 to 63: Fully connected layer
+
+
+
+Input ID: 4
+Output ID: 63

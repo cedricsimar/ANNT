@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 64: No action - Linear - 
+Input edges : 
+Output edges : 48  
+
+Vertex 65: No action - Linear - Flatten
+Input edges : 67  
+Output edges : 49  
+
+Vertex 66: No action - Linear - 
+Input edges : 49  
+Output edges : 8  
+
+Vertex 11: No action - Linear - 
+Input edges : 8  
+Output edges : 
+
+Vertex 84: No action - ReLu - Dropout - 
+Input edges : 48  
+Output edges : 67  
+
+Edges
+-----
+
+Edge 48 from 64 to 84: Identity layer
+
+Edge 49 from 65 to 66: Identity layer
+
+Edge 8 from 66 to 11: Fully connected layer
+
+Edge 67 from 84 to 65: Identity layer
+
+
+
+Input ID: 64
+Output ID: 11

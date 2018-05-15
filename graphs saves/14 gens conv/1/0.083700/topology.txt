@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 132: No action - Linear - 
+Input edges : 
+Output edges : 99  
+
+Vertex 133: No action - Linear - Flatten
+Input edges : 99  
+Output edges : 100  
+
+Vertex 134: No action - Linear - 
+Input edges : 100  
+Output edges : 115  
+
+Vertex 154: No action - Linear - 
+Input edges : 115  
+Output edges : 116  
+
+Vertex 155: No action - Linear - 
+Input edges : 116  
+Output edges : 
+
+Edges
+-----
+
+Edge 99 from 132 to 133: Identity layer
+
+Edge 100 from 133 to 134: Identity layer
+
+Edge 115 from 134 to 154: Identity layer
+
+Edge 116 from 154 to 155: Fully connected layer
+
+
+
+Input ID: 132
+Output ID: 155

@@ -36,6 +36,7 @@ class NN:
 
         # network building queue
         self.queue = deque([])
+        self.attempts = 0
 
         # retrieve input dimensionality
         self.input_dim = len(self.dna.input_shape)
@@ -105,7 +106,6 @@ class NN:
         # add the resulting tensor in a dictionary using the vertex id
         self.vertices_tensor[self.dna.input_vertex_id] = input_layer
 
-
         """
         Iteratively build the Neural Network layers following the DNA graph
         """
@@ -119,6 +119,8 @@ class NN:
 
                 # First we check if all input edge tensors have already been created
                 if(self.all_input_edges_created(v)):
+
+                    self.attempts = 0
 
                     # Check if the action type matches with the number of input edges
                     if (v.action == Settings.NO_ACTION and len(v.edges_in) > 1) or (v.action != Settings.NO_ACTION and len(v.edges_in) < 2):
@@ -136,18 +138,20 @@ class NN:
                     else:
                         
                         # compute the list of input tensors
-                        input_tensors = [self.edges_tensor[e.id] for e in v.edges_in]
+                        # input_tensors = [self.edges_tensor[e.id] for e in v.edges_in]
 
                         # apply the action
                         if v.action == Settings.SUM:
 
-                            tensor = input_tensors[0]
-                            for i in range(1, len(input_tensors)):
-                                tensor = tf.add(tensor, input_tensors[i])
+                            tensor = tf.add_n([self.edges_tensor[e.id] for e in v.edges_in])
+
+                            # tensor = input_tensors[0]
+                            # for i in range(1, len(input_tensors)):
+                            #     tensor = tf.add(tensor, input_tensors[i])
                         
                         elif v.action == Settings.CONCATENATION:
 
-                            tensor = tf.concat(input_tensors, axis = 1)
+                            tensor = tf.concat([self.edges_tensor[e.id] for e in v.edges_in], axis = 1)
 
                     # batch normalization
                     # TODO or not TODO
@@ -182,8 +186,9 @@ class NN:
                     # more tensors have to be created before this one
                     # if the queue is empty raise exception to avoid infinite loop
 
-                    if(len(self.queue) > 0):
+                    if(len(self.queue) > 0 and self.attempts < Settings.MAX_TF_ATTEMPTS):
                         self.queue.append(v)
+                        self.attempts += 1
                     else:
                         raise ImpossibleToBuild()
 
@@ -193,6 +198,8 @@ class NN:
 
                 # First we check if the vertex tensor has already been created
                 if(self.input_vertex_created(e)):
+
+                    self.attempts = 0
 
                     tensor = self.vertices_tensor[e.from_vertex.id]
                     
@@ -216,8 +223,9 @@ class NN:
                     # more tensors have to be created before this one 
                     # if the queue is empty raise exception to avoid infinite loop
 
-                    if(len(self.queue) > 0):
-                        self.queue.append(graph_object)
+                    if(len(self.queue) > 0 and self.attempts < Settings.MAX_TF_ATTEMPTS):
+                        self.queue.append(e)
+                        self.attempts += 1
                     else:
                         raise ImpossibleToBuild()
         

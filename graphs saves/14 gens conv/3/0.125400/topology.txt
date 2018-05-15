@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 8: No action - Linear - 
+Input edges : 
+Output edges : 6  
+
+Vertex 9: No action - Linear - Flatten
+Input edges : 6  
+Output edges : 1  
+
+Vertex 2: No action - Linear - 
+Input edges : 1  
+Output edges : 5  
+
+Vertex 7: No action - Linear - 
+Input edges : 5  
+Output edges : 
+
+Edges
+-----
+
+Edge 6 from 8 to 9: Identity layer
+
+Edge 1 from 9 to 2: Identity layer
+
+Edge 5 from 2 to 7: Fully connected layer
+
+
+
+Input ID: 8
+Output ID: 7

@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 4: No action - Linear - 
+Input edges : 
+Output edges : 3  
+
+Vertex 5: No action - Linear - Flatten
+Input edges : 123  
+Output edges : 2  
+
+Vertex 3: No action - Linear - 
+Input edges : 2  
+Output edges : 
+
+Vertex 110: No action - Linear - Dropout - 
+Input edges : 3  
+Output edges : 123  
+
+Edges
+-----
+
+Edge 3 from 4 to 110: Convolutional layer
+
+Edge 2 from 5 to 3: Fully connected layer
+
+Edge 123 from 110 to 5: Identity layer
+
+
+
+Input ID: 4
+Output ID: 3

@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 92: No action - Linear - 
+Input edges : 
+Output edges : 69  
+
+Vertex 93: No action - Linear - Flatten
+Input edges : 69  
+Output edges : 70  
+
+Vertex 94: No action - Linear - 
+Input edges : 70  
+Output edges : 13  
+
+Vertex 18: No action - Linear - 
+Input edges : 13  
+Output edges : 14  
+
+Vertex 19: No action - Linear - 
+Input edges : 14  
+Output edges : 
+
+Edges
+-----
+
+Edge 69 from 92 to 93: Identity layer
+
+Edge 70 from 93 to 94: Identity layer
+
+Edge 13 from 94 to 18: Identity layer
+
+Edge 14 from 18 to 19: Fully connected layer
+
+
+
+Input ID: 92
+Output ID: 19

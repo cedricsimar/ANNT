@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 12: No action - Linear - 
+Input edges : 
+Output edges : 9  
+
+Vertex 13: No action - Linear - Flatten
+Input edges : 76  
+Output edges : 14  
+
+Vertex 19: No action - Linear - 
+Input edges : 14  
+Output edges : 
+
+Vertex 88: No action - ReLu - Dropout - 
+Input edges : 9  
+Output edges : 76  
+
+Edges
+-----
+
+Edge 9 from 12 to 88: Fully connected layer
+
+Edge 14 from 13 to 19: Fully connected layer
+
+Edge 76 from 88 to 13: Identity layer
+
+
+
+Input ID: 12
+Output ID: 19

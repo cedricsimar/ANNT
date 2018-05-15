@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 124: No action - Linear - 
+Input edges : 
+Output edges : 93  
+
+Vertex 125: No action - Linear - Flatten
+Input edges : 93  
+Output edges : 94  
+
+Vertex 126: No action - Linear - 
+Input edges : 94  
+Output edges : 95  
+
+Vertex 127: No action - Linear - 
+Input edges : 95  
+Output edges : 
+
+Edges
+-----
+
+Edge 93 from 124 to 125: Identity layer
+
+Edge 94 from 125 to 126: Identity layer
+
+Edge 95 from 126 to 127: Fully connected layer
+
+
+
+Input ID: 124
+Output ID: 127

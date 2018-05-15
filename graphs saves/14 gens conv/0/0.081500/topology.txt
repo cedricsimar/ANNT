@@ -1,0 +1,32 @@
+Vertices
+--------
+
+Vertex 84: No action - Linear - 
+Input edges : 
+Output edges : 63  
+
+Vertex 85: No action - Linear - Flatten
+Input edges : 63  
+Output edges : 64  
+
+Vertex 86: No action - Linear - 
+Input edges : 64  
+Output edges : 65  
+
+Vertex 87: No action - Linear - 
+Input edges : 65  
+Output edges : 
+
+Edges
+-----
+
+Edge 63 from 84 to 85: Identity layer
+
+Edge 64 from 85 to 86: Identity layer
+
+Edge 65 from 86 to 87: Fully connected layer
+
+
+
+Input ID: 84
+Output ID: 87

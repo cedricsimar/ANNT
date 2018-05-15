@@ -1,0 +1,38 @@
+Vertices
+--------
+
+Vertex 4: No action - Linear - 
+Input edges : 
+Output edges : 3  
+
+Vertex 5: No action - Linear - Flatten
+Input edges : 74  
+Output edges : 1  
+
+Vertex 2: No action - Linear - 
+Input edges : 1  
+Output edges : 2  
+
+Vertex 3: No action - Linear - 
+Input edges : 2  
+Output edges : 
+
+Vertex 88: No action - ReLu - Dropout - 
+Input edges : 3  
+Output edges : 74  
+
+Edges
+-----
+
+Edge 3 from 4 to 88: Convolutional layer
+
+Edge 1 from 5 to 2: Identity layer
+
+Edge 2 from 2 to 3: Fully connected layer
+
+Edge 74 from 88 to 5: Identity layer
+
+
+
+Input ID: 4
+Output ID: 3
