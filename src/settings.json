@@ -11,6 +11,14 @@
         "desc": "Probability that a mutation occurs during a mutation phase",
         "value": 0.9
     },
+    "TMP_FOLDER_PATH": {
+        "desc": "Path of the tmp folder",
+        "value": "./tmp/"
+    },
+    "MODELS_FOLDER_PATH": {
+        "desc": "Path of the models folder",
+        "value": "./models/"
+    },
     "MUTATIONS_PER_BREEDING": {
         "desc": "Number of mutations that occurs on an individual during one breeding phase",
         "value": 1
@@ -20,12 +28,12 @@
         "value": 10
     },
     "TRAINING_STEPS": {
-        "desc": "2560 Number of training steps per individual (120 default: 600, paper: 25.600)",
+        "desc": "2560 Number of training steps per individual (debug: 200, default: 2560, paper: 25.600)",
         "value": 2560
     },
     "POPULATION_SIZE": {
         "desc": "Number of individuals in the population",
-        "value": 20
+        "value": 50
     },
     "MAX_GENERATIONS": {
         "desc": "Maximum number of generations to evolve",
@@ -44,7 +52,7 @@
         "value": 15
     },
     "EVALUATION_RATE": {
-        "desc": "Number of steps before evaluating the network performances (default: 5)",
+        "desc": "Number of steps before evaluating the network performances (default: 160)",
         "value": 160
     },
     "MAX_TF_ATTEMPTS": {

@@ -176,6 +176,8 @@ class DNA:
             elif e.type == Settings.IDENTITY:
                 print("Identity layer\n")
         
+        print("\n")
+        
 
     def create_primitive_structure(self):
 

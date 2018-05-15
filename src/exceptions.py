@@ -39,3 +39,10 @@ class CycleException(Exception):
     def __init__(self, message = "The newly added edge created a cycle in the Neural Network graph"):
 
         super().__init__(message)
+
+
+class SaveMyLaptopException(Exception):
+
+    def __init__(self, message = "The number of trainable parameters exceeds the RAM capacity"):
+
+        super().__init__(message)

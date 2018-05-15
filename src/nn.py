@@ -341,7 +341,9 @@ class NN:
         """ Return the mean prediction error """
 
         prediction_errors = tf.not_equal(tf.argmax(self.predict, 1), tf.argmax(self.labels, 1))
-        return (tf.reduce_mean(tf.cast(prediction_errors, tf.float32)))
+        mean_prediction_error = tf.reduce_mean(tf.cast(prediction_errors, tf.float32))
+        tf.summary.scalar("mean_prediction_error", mean_prediction_error)
+        return (mean_prediction_error)
 
 
     @define_scope
@@ -351,6 +353,7 @@ class NN:
 
         self.batch_loss = tf.nn.softmax_cross_entropy_with_logits(labels=self.labels, logits=self.predict)
         self.mean_loss = tf.reduce_mean(self.batch_loss, name="mean_loss")
+        tf.summary.scalar("mean_loss", self.mean_loss)
         return (self.mean_loss)
         
 

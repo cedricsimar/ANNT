@@ -1,6 +1,6 @@
 
 from settings import Settings
-from exceptions import NoBridgeException
+from exceptions import NoBridgeException, SaveMyLaptopException
 from random import randint
 from copy import deepcopy
 
@@ -8,7 +8,7 @@ from dna import DNA
 from mutation import Mutation
 from cross_over import Cross_Over
 from nn import NN
-from utils import reshape_mnist_images
+from utils import reshape_mnist_images, clean_folder, copy_files_from_to
 
 import numpy as np
 import tensorflow as tf
@@ -84,6 +84,27 @@ class GeneticAlgorithm(object):
             self.population = self.next_generation_dna
             self.fitness = self.next_generation_fitness
 
+            # update the best_generations_fitness list
+            self.best_generations_fitness.append(self.fitness[0])
+
+            # update the number of mutations per breeding if necessary 
+            # the number of mutations can be increased temporarily to get out of a local optimum
+            gen_i = len(self.best_generations_fitness) - 1
+            previous_gen_i = gen_i - 1
+
+            if(self.best_generations_fitness[gen_i] <= self.best_generations_fitness[previous_gen_i]):
+                self.mutations_per_breeding += 1
+            else:
+                self.mutations_per_breeding = max(1, self.mutations_per_breeding - 1)
+            
+            print("\n ===============================================")
+            print("\n ============== End of generation ==============")
+            print("\nFitness history through generations :", self.best_generations_fitness)
+            best_so_far = max(self.best_generations_fitness)
+            print("The best individual so far is from generation", self.best_generations_fitness.index(best_so_far),
+                  "with a fitness of ", best_so_far)
+            print("\n ===============================================")
+            
 
     def attempt_breeding(self, individual_i, individual_j):
 
@@ -101,10 +122,11 @@ class GeneticAlgorithm(object):
 
         successful_breedings = 0
         breeding_attempts = 0
-        
+
         while(successful_breedings < 2 and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
             
             try:
+                # cross over the two individuals
                 offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
             
             except NoBridgeException as e:
@@ -114,10 +136,14 @@ class GeneticAlgorithm(object):
                 
 
             for offspring in [offspring_1, offspring_2]:
-            
-                mutated_offspring = Mutation(offspring).mutate()
 
-                # Build and train the crossed-mutated graphs on the spot
+                # apply (several if we are stuck in a local optimum) mutations to the offspring  
+                for _ in range(self.mutations_per_breeding):
+                    offspring = Mutation(offspring).mutate()
+                
+                mutated_offspring = offspring
+
+                # build and train the crossed-mutated graphs on the spot
                 if(successful_breedings < 2):
                         
                     try:
@@ -128,7 +154,7 @@ class GeneticAlgorithm(object):
                         successful_breedings += 1
 
                     except Exception as e:
-                        print("DNA ill-formed: Failed to build the NN \n\n" + str(e))
+                        print("Failed to build the NN \n\n" + str(e))
                     
           
         return(successful_breedings)
@@ -150,19 +176,24 @@ class GeneticAlgorithm(object):
             nn = NN(individual_dna)
 
             # and train the resulting model
-
-
+            num_trainable_variables = np.sum([np.prod(v.shape) for v in tf.trainable_variables()])
             print("==========================================")
-            print("Number of trainable variables : ", end='')
-            print(np.sum([np.prod(v.shape) for v in tf.trainable_variables()]))
+            print("Number of trainable variables :", num_trainable_variables)
             print("Training the following DNA: \n")
             print(nn.dna)
 
+            if(num_trainable_variables > Settings.MAX_TRAINABLE_PARAMETERS):
+                raise SaveMyLaptopException()
+
             with tf.Session(graph=graph) as sess:
-                    
-                # sess = tf.Session(graph=nn.get_graph())
+
+                # merge the summaries and create a file writer in the tmp folder
+                clean_folder(Settings.TMP_FOLDER_PATH)
+                merged_summaries = tf.summary.merge_all()
+                writer = tf.summary.FileWriter(Settings.TMP_FOLDER_PATH, sess.graph)
+                
+                # initialize variables and finalize the graph
                 sess.run(tf.global_variables_initializer())
-                # nn.sess.run(tf.initialize_local_variables())
                 sess.graph.finalize()
 
                 for training_step in range(Settings.TRAINING_STEPS):
@@ -175,21 +206,24 @@ class GeneticAlgorithm(object):
 
                     # performance evaluation every few training steps
                     if not training_step % Settings.EVALUATION_RATE:
-                        validation_error = sess.run(nn.prediction_error, {nn.input: self.validation_data, nn.labels: self.validation_labels})
+                        summary, validation_error = sess.run([merged_summaries, nn.prediction_error], {nn.input: self.validation_data, nn.labels: self.validation_labels})
+                        writer.add_summary(summary, training_step)
                         print('Test error {:6.2f}%'.format(100 * validation_error))
                         best_validation_error = min(best_validation_error, validation_error)
 
-                # save graph logs and dna string
-                log_path = "./tmp/log/" + str(self.generation) + "/" + "{:f}".format(best_validation_error)
-                
-                writer = tf.summary.FileWriter(log_path, sess.graph)
+                # close the writer 
                 writer.close()
 
-                file_path = log_path + "/topology.txt"
-                with open(file_path, 'w') as topo_file:
+                # save graph logs and dna string into the right models folder
+                model_path = Settings.MODELS_FOLDER_PATH + str(self.generation) + "/" + "{:f}".format(best_validation_error)               
+
+                copy_files_from_to(Settings.TMP_FOLDER_PATH, model_path)
+
+                file_path = model_path + "/topology.txt"
+                with open(file_path, 'a') as topo_file:
                     topo_file.write(nn.dna.__str__())
          
-        print("Training and Saving complete !")
+        print("Training and Saving complete !\n\n")
 
         return(best_validation_error)
 
@@ -210,3 +244,6 @@ class GeneticAlgorithm(object):
 
             self.population.append(individual_dna)
             self.fitness.append(individual_fitness)
+
+        # they are all the same primitive networks so the choice doesn't matter much
+        self.best_generations_fitness.append(self.fitness[0])
