@@ -65,7 +65,9 @@ class NN:
         self.optimize
         self.loss
             
-
+        """
+        The following might be useful to try weights inheritance
+        """
         # # Initialize input placeholder to assign values to weights and biases
         # with tf.variable_scope("input_assignment"):
 
@@ -290,7 +292,7 @@ class NN:
 
 
         # batch normalization
-        # TODO or not TODO
+        # TODO
 
         # activation / non-linearity
         if v.activation == Settings.RELU:
@@ -375,6 +377,7 @@ class NN:
 
     def get_value(self, var_name, tf_session):
         """
+        If one day we want to try weight inheritance..
         Return the value of the tf variable named [var_name] if it exists, None otherwise
         """
 
@@ -387,13 +390,14 @@ class NN:
             value = tf_session.run(self.layers[var_name])
 
         else:
-            print("Unknown DQN variable: " + var_name)
-            assert(0)  # <3
+            print("Unknown variable: " + var_name)
+            value = None
 
         return(value)
 
     def set_value(self, var_name, new_value, tf_session):
         """
+        If one day we want to try weight inheritance..
         Set the value of the tf variable [var_name] to [new_value]
         """
 
