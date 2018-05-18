@@ -33,6 +33,9 @@ class GeneticAlgorithm(object):
         self.best_generations_fitness = []
 
         # if there is a check point, load it, otherwise start with an initial population
+        if not os.path.exists(Settings.CHECKPOINT_PATH):
+            os.mkdir(Settings.CHECKPOINT_PATH)
+        
         self.start_generation = len(os.listdir(Settings.CHECKPOINT_PATH))
 
         if(self.start_generation):
@@ -63,14 +66,12 @@ class GeneticAlgorithm(object):
                 self.next_generation_fitness.append(self.fitness[best_i])
 
             # breed the three best individuals together
-            # (produces at most 6 offsprings)
             for best_i in range(Settings.N_BEST_CANDIDATES):
                 for best_j in range(best_i + 1, Settings.N_BEST_CANDIDATES):
                     self.attempt_breeding(best_i, best_j)
             
             # breed each best individual with a random individual from the population
             # including itself because, well.. parthenogenesis and all..
-            # (produces at most 6 offsprings)
             for best_i in range(Settings.N_BEST_CANDIDATES):
                 other_i = randint(0, self.population_size - 1)
                 self.attempt_breeding(best_i, other_i)
@@ -97,10 +98,10 @@ class GeneticAlgorithm(object):
             gen_i = len(self.best_generations_fitness) - 1
             previous_gen_i = gen_i - 1
 
-            if(self.best_generations_fitness[gen_i] <= self.best_generations_fitness[previous_gen_i]):
+            if(self.best_generations_fitness[previous_gen_i] <= self.best_generations_fitness[gen_i]):
                 self.mutations_per_breeding += 1
             else:
-                self.mutations_per_breeding = max(1, self.mutations_per_breeding - 1)
+                self.mutations_per_breeding = 1
             
             # save generation checkpoint
             self.save_generation_checkpoint()
@@ -140,6 +141,9 @@ class GeneticAlgorithm(object):
             
             except NoBridgeException as e:
                 print(e)
+                print("Failed to cross-over the individuals")
+                return (False)
+            except Exception as e:
                 print("Failed to cross-over the individuals")
                 return (False)
                 

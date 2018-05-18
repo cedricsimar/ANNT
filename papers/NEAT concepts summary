@@ -1,9 +1,0 @@
-Force minimal topologies: we use 2)
-1) incorporate network size into the fitness function but not easy to know how large the penalty should be because different problems may have significantly different topological requirements
-2) starting out with a minimal population and growing structure from there is a design principle in NEAT.
-
-The goal is not to minimize only the final product, but all intermediate networks along the way as well -> minimize the search space
-Problem: without initial topological diversity, topological innovations would not survive
--> speciating the population in NEAT solves this problem
-
-

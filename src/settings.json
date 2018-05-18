@@ -33,11 +33,11 @@
     },
     "TRAINING_STEPS": {
         "desc": "2560 Number of training steps per individual (debug: 200, default: 2560, paper: 25.600)",
-        "value": 5120
+        "value": 2560
     },
     "POPULATION_SIZE": {
         "desc": "Number of individuals in the population",
-        "value": 50
+        "value": 30
     },
     "MAX_GENERATIONS": {
         "desc": "Maximum number of generations to evolve",
@@ -49,7 +49,7 @@
     },
     "N_BEST_CANDIDATES": {
         "desc": "Number of best candidates that will constitute a major basis of the next generation",
-        "value": 5
+        "value": 4
     },
     "MAX_BREEDING_ATTEMPTS": {
         "desc": "Maximum number of breeding attemps between two parents",
@@ -57,7 +57,7 @@
     },
     "EVALUATION_RATE": {
         "desc": "Number of steps before evaluating the network performances (default: 160)",
-        "value": 160
+        "value": 80
     },
     "MAX_TF_ATTEMPTS": {
         "desc": "Number of steps before evaluating the network performances (default: 20)",
