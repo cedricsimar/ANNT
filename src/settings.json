@@ -13,15 +13,15 @@
     },
     "TMP_FOLDER_PATH": {
         "desc": "Path of the tmp folder",
-        "value": "./tmp/"
+        "value": ".\\tmp\\"
     },
     "MODELS_FOLDER_PATH": {
         "desc": "Path of the models folder",
-        "value": "./models/"
+        "value": ".\\models\\"
     },
     "CHECKPOINT_PATH": {
         "desc": "Path of the checkpoint folder",
-        "value": "./checkpoint/"
+        "value": ".\\checkpoint\\"
     },
     "MUTATIONS_PER_BREEDING": {
         "desc": "Number of mutations that occurs on an individual during one breeding phase",

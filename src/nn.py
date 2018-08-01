@@ -13,6 +13,10 @@ from tensorflow.python.ops.init_ops import glorot_uniform_initializer
 from vertex import Vertex
 from edge import Edge
 
+# import os
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+
 class NN:
 
     def __init__(self, dna):
@@ -64,7 +68,7 @@ class NN:
         self.prediction_error
         self.optimize
         self.loss
-            
+
         """
         The following might be useful to try weights inheritance
         """
@@ -85,7 +89,7 @@ class NN:
         #         except AttributeError as e:
         #             print(e)
 
-    
+
 
     @define_scope
     def predict(self):
@@ -100,7 +104,7 @@ class NN:
             input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], 1])
         elif self.input_dim == 2:
             # 2D input
-            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], 1])        
+            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], 1])
 
         # push all outgoing edges to the queue
         for edge_out in self.root.edges_out:
@@ -115,7 +119,7 @@ class NN:
         while(len(self.queue) > 0):
 
             graph_object = self.queue.popleft()
-            
+
             if(graph_object.is_vertex()):
 
                 v = graph_object
@@ -139,7 +143,7 @@ class NN:
                         tensor = self.edges_tensor[v.edges_in[0].id]
 
                     else:
-                        
+
                         # compute the list of input tensors
                         # input_tensors = [self.edges_tensor[e.id] for e in v.edges_in]
 
@@ -151,7 +155,7 @@ class NN:
                             # tensor = input_tensors[0]
                             # for i in range(1, len(input_tensors)):
                             #     tensor = tf.add(tensor, input_tensors[i])
-                        
+
                         elif v.action == Settings.CONCATENATION:
 
                             tensor = tf.concat([self.edges_tensor[e.id] for e in v.edges_in], axis = 1)
@@ -166,26 +170,26 @@ class NN:
                     # max pooling
                     if v.max_pooling == Settings.USE_MAX_POOLING:
                         tensor = tf.layers.max_pooling2d(inputs=tensor, pool_size=Settings.DEFAULT_POOLING_SHAPE, strides=Settings.DEFAULT_POOLING_STRIDE)
-                    
+
                     # flatten
                     if v.flatten == Settings.FLATTEN:
-                        tensor = tf.layers.flatten(tensor)
+                        tensor = tf.contrib.layers.flatten(tensor)
 
                     # dropout
                     if v.dropout == Settings.USE_DROPOUT:
                         tensor = tf.layers.dropout(inputs=tensor, rate=Settings.DROPOUT_RATE, training=self.is_training)
 
                     #################################################
-                    
+
                     # add the resulting tensor in the vertices dictionary
                     self.vertices_tensor[v.id] = tensor
 
                     # push all outgoing edges to the queue
                     for edge_out in v.edges_out:
                         self.queue.append(edge_out)
-                
+
                 else:
-                    # put vertex back in queue 
+                    # put vertex back in queue
                     # more tensors have to be created before this one
                     # if the queue is empty raise exception to avoid infinite loop
 
@@ -196,7 +200,7 @@ class NN:
                         raise ImpossibleToBuild()
 
             else:
-                
+
                 e = graph_object
 
                 # First we check if the vertex tensor has already been created
@@ -205,7 +209,7 @@ class NN:
                     self.attempts = 0
 
                     tensor = self.vertices_tensor[e.from_vertex.id]
-                    
+
                     if e.type == Settings.FULLY_CONNECTED:
 
                         tensor = tf.layers.dense(tensor, e.units, use_bias=True, kernel_initializer = glorot_uniform_initializer())
@@ -214,7 +218,7 @@ class NN:
 
                         tensor=tf.layers.conv2d(tensor, e.kernels, e.kernel_shape, e.stride, padding="same",
                                                 kernel_initializer = glorot_uniform_initializer())
-                
+
                     # add the resulting tensor in the edges dictionary
                     self.edges_tensor[e.id] = tensor
 
@@ -223,7 +227,7 @@ class NN:
 
                 else:
                     # put edge back in queue
-                    # more tensors have to be created before this one 
+                    # more tensors have to be created before this one
                     # if the queue is empty raise exception to avoid infinite loop
 
                     if(len(self.queue) > 0 and self.attempts < Settings.MAX_TF_ATTEMPTS):
@@ -231,7 +235,7 @@ class NN:
                         self.attempts += 1
                     else:
                         raise ImpossibleToBuild()
-        
+
         return(tensor)
 
 
@@ -242,10 +246,10 @@ class NN:
         for input_edge in v.edges_in:
             if input_edge.id not in self.edges_tensor:
                 all_created = False
-        
+
         return (all_created)
-        
-    
+
+
     def input_vertex_created(self, e):
 
         return(e.from_vertex.id in self.vertices_tensor)
@@ -253,7 +257,7 @@ class NN:
 
     def from_vertex_to_tensor(self, v):
 
-        # It is assumed that inputs dimension of all actions have been properly 
+        # It is assumed that inputs dimension of all actions have been properly
         # checked during the mutation phase
 
         # First we check if all input edge tensors have already been created
@@ -264,7 +268,7 @@ class NN:
         # Check if the action type matches with the number of input edges
         if (v.action == Settings.NO_ACTION and len(v.edges_in) > 1) or (v.action != Settings.NO_ACTION and len(v.edges_in) < 2):
             raise InvalidNumberOfEdges()
-        
+
         # sequentially check the vertex attributes and create the tensors accordingly
         # action -> batch normalization -> activation -> max-pooling -> dropout
 
@@ -275,7 +279,7 @@ class NN:
             tensor = self.edges_tensor[v.edges_in[0].id]
 
         else:
-            
+
             # compute the list of input tensors
             input_tensors = [self.edges_tensor[e.id] for e in v.edges_in]
 
@@ -285,7 +289,7 @@ class NN:
                 tensor = input_tensors[0]
                 for i in range(1, len(input_tensors)):
                     tensor = tf.add(tensor, input_tensors[i])
-            
+
             elif v.action == Settings.CONCATENATION:
 
                 tensor = tf.concat(input_tensors, axis = 1)
@@ -302,17 +306,17 @@ class NN:
         # max pooling
         if v.max_pooling == Settings.USE_MAX_POOLING:
             tensor = tf.layers.max_pooling2d(inputs=tensor, pool_size=Settings.DEFAULT_POOLING_SHAPE, strides=Settings.DEFAULT_POOLING_STRIDE)
-        
+
         # flatten
         if v.flatten == Settings.FLATTEN:
-            tensor = tf.layers.flatten(tensor)
+            tensor = tf.contrib.layers.flatten(tensor)
 
         # dropout
         if v.dropout == Settings.USE_DROPOUT:
             tensor = tf.layers.dropout(inputs=tensor, rate=Settings.DROPOUT_RATE)
 
         return (tensor)
-    
+
 
     def from_edge_to_tensor(self, e):
 
@@ -321,7 +325,7 @@ class NN:
             return (None)
 
         tensor = self.vertices_tensor[e.from_vertex.id]
-        
+
         if e.type == Settings.FULLY_CONNECTED:
 
             tensor = tf.layers.dense(tensor, e.units, use_bias=True, kernel_initializer = glorot_uniform_initializer())
@@ -332,12 +336,12 @@ class NN:
                                     kernel_initializer = glorot_uniform_initializer())
 
         return (tensor)
-        
+
 
     # @define_scope
     # def predict_proba(self):
     #     return(tf.sigmoid(self.predict))
-    
+
     @define_scope
     def prediction_error(self):
 
@@ -358,7 +362,7 @@ class NN:
         self.mean_loss = tf.reduce_mean(self.batch_loss, name="mean_loss")
         tf.summary.scalar("mean_loss", self.mean_loss)
         return (self.mean_loss)
-        
+
 
     @define_scope
     def optimize(self):
@@ -373,7 +377,7 @@ class NN:
 
     def get_graph(self):
         return(self.graph)
-    
+
 
     def get_value(self, var_name, tf_session):
         """
