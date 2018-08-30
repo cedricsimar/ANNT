@@ -10,13 +10,13 @@ from copy import deepcopy
 class Cross_Over:
 
     def __init__(self, parent_1, parent_2):
-        
+
         # deepcopy in case parent 1 and 2 are the same individual
         self.parent_1 = deepcopy(parent_1)
         self.parent_2 = deepcopy(parent_2)
 
 
-    def breed(self):
+    def breed(self, dataset='m'):
 
         # compute all the bridges of the parents
         parent_1_bridges = self.bridges(self.parent_1)
@@ -30,16 +30,21 @@ class Cross_Over:
         bridge_2_v_id = choice(parent_2_bridges)
 
         # create the two offsprings from the parents
-        offspring_1, offspring_2 = self.create_offsprings(bridge_1_v_id, bridge_2_v_id)
+        offspring_1, offspring_2 = self.create_offsprings(
+            bridge_1_v_id, bridge_2_v_id, dataset)
 
         return(offspring_1, offspring_2)
 
 
-    def create_offsprings(self, bridge_1_v_id, bridge_2_v_id):
-        
+    def create_offsprings(self, bridge_1_v_id, bridge_2_v_id, dataset):
+
         # create the empty offsprings
-        offspring_1 = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
-        offspring_2 = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
+        if(dataset == 'm'):
+            offspring_1 = DNA(Settings.INPUT_SHAPE_MNIST, Settings.OUTPUT_SHAPE)
+            offspring_2 = DNA(Settings.INPUT_SHAPE_MNIST, Settings.OUTPUT_SHAPE)
+        else:
+            offspring_1 = DNA(Settings.INPUT_SHAPE_CIFAR10, Settings.OUTPUT_SHAPE)
+            offspring_2 = DNA(Settings.INPUT_SHAPE_CIFAR10, Settings.OUTPUT_SHAPE)
 
         # populate the input and output attributes
         offspring_1.input_vertex_id = self.parent_1.input_vertex_id
@@ -67,7 +72,7 @@ class Cross_Over:
         swap_tmp = offspring_1.vertices[bridge_1_v_id].mutable_out
         offspring_1.vertices[bridge_1_v_id].mutable_out = offspring_2.vertices[bridge_2_v_id].mutable_out
         offspring_2.vertices[bridge_2_v_id].mutable_out = swap_tmp
-        
+
         # populate the rest of the offsprings
         self.grow_offspring(offspring_1, offspring_1.vertices[bridge_1_v_id], -1)
         self.grow_offspring(offspring_2, offspring_2.vertices[bridge_2_v_id], -1)
@@ -124,7 +129,7 @@ class Cross_Over:
             offspring.add_vertex(current_vertex)
 
             if(current_vertex.id != to_vertex_id):
-                    
+
                 for e_out in current_vertex.edges_out:
                     offspring.add_edge(e_out)
                     vertex_q.append(e_out.to_vertex)
@@ -163,9 +168,9 @@ class Cross_Over:
 
 
     def bridges(self, dna):
-        
+
         """
-        Naive algorithm to return all the bridges (vertices which, if deleted cut 
+        Naive algorithm to return all the bridges (vertices which, if deleted cut
         the graph in two non-connected subgraph) of a NN graph from DNA
         """
 
@@ -183,15 +188,15 @@ class Cross_Over:
             print("======= BABY ======")
             print(dna)
             exit()
-        
+
         for bridge_candidate in list_of_vertices:
 
             if(self.is_bridge(bridge_candidate, dna)):
                 bridges.append(bridge_candidate)
-        
+
         return(bridges)
 
-    
+
     def is_bridge(self, v_id, dna):
 
         is_a_bridge = False
@@ -202,7 +207,7 @@ class Cross_Over:
 
         start_vertex = dna.vertices[dna.input_vertex_id]
         output_id = 1 # objective to reach
-        
+
         queue.append(start_vertex)
 
         # push all out vertices connected to the root vertex in the queue if not v_id
@@ -218,14 +223,14 @@ class Cross_Over:
 
             if(current_vertex.id == output_id):
                 output_reached = True
-            
+
             else:
 
                 for edge_out in current_vertex.edges_out:
 
                     if(edge_out.to_vertex.id != v_id and edge_out.to_vertex.id not in explored):
                         queue.append(edge_out.to_vertex)
-            
+
                 explored[current_vertex.id] = True
 
 
@@ -233,9 +238,3 @@ class Cross_Over:
             is_a_bridge = True
 
         return(is_a_bridge)
-
-        
-
-
-
-

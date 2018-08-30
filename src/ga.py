@@ -12,24 +12,31 @@ from dna import DNA
 from mutation import Mutation
 from cross_over import Cross_Over
 from nn import NN
-from utils import reshape_mnist_images, clean_folder, copy_files_from_to
+from utils import reshape_mnist_images, reshape_cifar10_images, clean_folder, copy_files_from_to
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
+from tensorflow.examples.tutorials.mnist import input_data as mnist_input
+import cifar10 as cifar10_input
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 class GeneticAlgorithm(object):
 
-    def __init__(self, population_size):
+    def __init__(self, population_size, dataset='m'):
 
         self.generation = 0
         self.population_size = population_size
         self.mutations_per_breeding = Settings.MUTATIONS_PER_BREEDING
+        self.dataset = dataset
 
-        self.mnist = input_data.read_data_sets("MNIST_data", one_hot=True)
+        # Select dataset: m = MNIST, c = CIFAR-10.
+        if(self.dataset == 'm'):
+            self.data = mnist_input.read_data_sets("MNIST_data", one_hot=True,
+                                                    validation_size=0)
+        else:
+            self.data = cifar10_input.read_data_sets(validation_size=0)
 
         self.population = []
         self.fitness = []
@@ -42,18 +49,18 @@ class GeneticAlgorithm(object):
         self.gentimes_writer = open(self.gentimes, 'w')
 
         # If there is a check point, load it, otherwise start with an initial population.
-        if not os.path.exists(Settings.CHECKPOINT_PATH):
-            os.mkdir(Settings.CHECKPOINT_PATH)
+        if not os.path.exists(Settings.CHECKPOINT_PATH + self.dataset + "\\"):
+            os.mkdir(Settings.CHECKPOINT_PATH + self.dataset + "\\")
 
-        self.start_generation = len(os.listdir(Settings.CHECKPOINT_PATH))
+        self.start_generation = len(os.listdir(Settings.CHECKPOINT_PATH + self.dataset + "\\")) - 1
 
-        if(self.start_generation):
+        if(self.start_generation+1):
             self.load_last_saved_generation()
         else:
             beginTime = time.time()
             self.create_initial_population()
             endTime = time.time()
-            print('INITIAL POPULATION TIME: {:5.2f}s\n'.format(endTime - beginTime))
+            print('TIME TAKEN FOR PRODUCING INITIAL POPULATION: {:5.2f}s\n'.format(endTime - beginTime))
             self.gentimes_writer.write(
                 'Initial population time: ' + str(endTime - beginTime) + 's\n')
 
@@ -82,20 +89,39 @@ class GeneticAlgorithm(object):
                 self.next_generation_dna.append(self.population[best_i])
                 self.next_generation_fitness.append(self.fitness[best_i])
 
+            print("\a-------------------------------------------------")
+            print("BREEDING BEST INDIVIDUALS (GEN " + str(self.generation) + ")")
+            print("-------------------------------------------------")
             # breed the best individuals together
             for best_i in range(Settings.N_BEST_CANDIDATES):
                 for best_j in range(best_i + 1, Settings.N_BEST_CANDIDATES):
+                    print("==========================================")
+                    print("Breeding individuals", best_i, "and", best_j,
+                          "(out of", Settings.N_BEST_CANDIDATES, ")")
                     self.attempt_breeding(best_i, best_j)
 
+            print("\a-------------------------------------------------")
+            print("BREEDING BEST WITH RANDOM (GEN " + str(self.generation) + ")")
+            print("-------------------------------------------------")
             # breed each best individual with a random individual from the population
             # including itself because, well.. parthenogenesis and all..
             for best_i in range(Settings.N_BEST_CANDIDATES):
+                print("==========================================")
+                print("Breeding individual", best_i, "(out of",
+                      Settings.N_BEST_CANDIDATES, ") with a RANDOM individual")
                 other_i = randint(0, self.population_size - 1)
                 self.attempt_breeding(best_i, other_i)
 
+            print("\a-------------------------------------------------")
+            print("BREEDING RANDOM INDIVIDUALS (GEN " + str(self.generation) + ")")
+            print("-------------------------------------------------")
             # breed two different random individuals together until the number of offsprings
             # reaches the maximum population size
             while(len(self.next_generation_dna) < self.population_size):
+                print("==========================================")
+                print("Breeding random individuals together (",
+                      self.population_size - len(self.next_generation_dna),
+                      "random breedings to complete population)")
                 other_i = randint(0, self.population_size - 1)
                 other_j = randint(0, self.population_size - 1)
                 self.attempt_breeding(other_i, other_j)
@@ -125,16 +151,16 @@ class GeneticAlgorithm(object):
             endTime = time.time()
 
             print("\n ===============================================")
-            print("\n ============== End of generation ==============")
+            print("\n ============== END OF GENERATION ==============")
             print("\nFitness history through generations :", self.best_generations_fitness)
             best_so_far = max(self.best_generations_fitness)
             print("The best individual so far is from generation", self.best_generations_fitness.index(best_so_far),
                   "with a fitness of ", best_so_far)
-            print('Time taken for executing this generation: {:5.2f}s\n'.format(endTime - beginTime))
+            print('TIME TAKEN FOR EXECUTING THIS GENERATION: {:5.2f}s\n'.format(endTime - beginTime))
             print("\n ===============================================")
 
             self.gentimes_writer.write('Generation #' + str(self.generation)
-                                       + ': ' + str(endTime - beginTime)
+                                       + ' time: ' + str(endTime - beginTime)
                                        + 's\n')
 
 
@@ -159,7 +185,9 @@ class GeneticAlgorithm(object):
 
             try:
                 # cross over the two individuals
-                offspring_1, offspring_2 = Cross_Over(self.population[individual_i], self.population[individual_j]).breed()
+                offspring_1, offspring_2 = Cross_Over(
+                    self.population[individual_i],
+                    self.population[individual_j]).breed(self.dataset)
 
             except NoBridgeException as e:
                 print(e)
@@ -228,9 +256,9 @@ class GeneticAlgorithm(object):
             with tf.Session(graph=graph, config=config) as sess:
 
                 # merge the summaries and create a file writer in the tmp folder
-                clean_folder(Settings.TMP_FOLDER_PATH)
+                clean_folder(Settings.TMP_FOLDER_PATH + self.dataset + "\\")
                 merged_summaries = tf.summary.merge_all()
-                writer = tf.summary.FileWriter(Settings.TMP_FOLDER_PATH, sess.graph)
+                writer = tf.summary.FileWriter(Settings.TMP_FOLDER_PATH + self.dataset + "\\", sess.graph)
 
                 # initialize variables and finalize the graph
                 sess.run(tf.global_variables_initializer())
@@ -239,16 +267,22 @@ class GeneticAlgorithm(object):
                 for training_step in range(Settings.TRAINING_STEPS):
 
                     # training step
-                    images, labels = self.mnist.train.next_batch(Settings.MINIBATCH_SIZE)
-                    images = reshape_mnist_images(images)
+                    images, labels = self.data.train.next_batch(Settings.MINIBATCH_SIZE)
+                    if(self.dataset == 'm'):
+                        images = reshape_mnist_images(images)
+                    else:
+                        images = reshape_cifar10_images(images)
 
                     sess.run(nn.optimize, {nn.input: images, nn.labels: labels, nn.is_training: True})
 
                     # performance evaluation every few training steps
                     if not training_step % Settings.EVALUATION_RATE:
 
-                        test_images, test_labels = self.mnist.test.next_batch(Settings.TEST_BATCH_SIZE)
-                        test_images = reshape_mnist_images(test_images)
+                        test_images, test_labels = self.data.test.next_batch(Settings.TEST_BATCH_SIZE)
+                        if(self.dataset == 'm'):
+                            test_images = reshape_mnist_images(test_images)
+                        else:
+                            test_images = reshape_cifar10_images(test_images)
 
                         summary, validation_error = sess.run([merged_summaries, nn.prediction_error], {nn.input: test_images, nn.labels: test_labels, nn.is_training: False})
                         writer.add_summary(summary, training_step)
@@ -259,9 +293,9 @@ class GeneticAlgorithm(object):
                 writer.close()
 
                 # save graph logs and dna string into the right models folder
-                model_path = Settings.MODELS_FOLDER_PATH + str(self.generation) + "\\" + "{:f}".format(best_validation_error)
+                model_path = Settings.MODELS_FOLDER_PATH + self.dataset + "\\" + str(self.generation) + "\\" + "{:f}".format(best_validation_error)
 
-                copy_files_from_to(Settings.TMP_FOLDER_PATH, model_path)
+                copy_files_from_to(Settings.TMP_FOLDER_PATH + self.dataset + "\\", model_path)
 
                 file_path = model_path + "\\topology.txt"
                 with open(file_path, 'a') as topo_file:
@@ -283,7 +317,10 @@ class GeneticAlgorithm(object):
             print("==========================================")
             print("Creating individual", individual_i, "out of", self.population_size)
 
-            individual_dna = DNA(Settings.INPUT_SHAPE, Settings.OUTPUT_SHAPE)
+            if(self.dataset == 'm'):
+                individual_dna = DNA(Settings.INPUT_SHAPE_MNIST, Settings.OUTPUT_SHAPE)
+            else:
+                individual_dna = DNA(Settings.INPUT_SHAPE_CIFAR10, Settings.OUTPUT_SHAPE)
             individual_dna.create_primitive_structure()
 
             individual_fitness = self.build_and_train_network(individual_dna)
@@ -291,14 +328,21 @@ class GeneticAlgorithm(object):
             self.population.append(individual_dna)
             self.fitness.append(individual_fitness)
 
-        self.best_generations_fitness.append(min(self.fitness))
+        # sort these first individuals by fitness
+        self.fitness, self.population = (list(t) for t in zip(*sorted(zip(self.fitness, self.population))))
+
+        # update the best_generations_fitness list
+        self.best_generations_fitness.append(self.fitness[0])
+
+        # save a checkpoint for the initial population
+        self.save_generation_checkpoint()
 
 
     def load_last_saved_generation(self):
 
         print("Loading generation", self.start_generation, "from checkpoint..  ", end='')
 
-        last_checkpoint_path = Settings.CHECKPOINT_PATH + str(self.start_generation) + "\\"
+        last_checkpoint_path = Settings.CHECKPOINT_PATH + self.dataset + "\\" + str(self.start_generation) + "\\"
 
         # load the population list
         population_file = open(last_checkpoint_path + "population.pickle", "rb")
@@ -323,7 +367,7 @@ class GeneticAlgorithm(object):
 
     def save_generation_checkpoint(self):
 
-        save_path = Settings.CHECKPOINT_PATH + str(self.generation) + "\\"
+        save_path = Settings.CHECKPOINT_PATH + self.dataset + "\\" + str(self.generation) + "\\"
         os.mkdir(save_path)
 
         print("Saving generation", self.generation, "in the checkpoint folder..  ", end='')

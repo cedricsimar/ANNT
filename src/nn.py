@@ -52,6 +52,9 @@ class NN:
         elif self.input_dim == 2:
             # 2D input
             self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0], self.dna.input_shape[1]], name="input")
+        elif self.input_dim == 3:
+            # 3D input (RGB)
+            self.input = tf.placeholder(tf.float32, [None, self.dna.input_shape[0], self.dna.input_shape[1], self.dna.input_shape[2]], name="input")
 
         self.labels = tf.placeholder(tf.float32, [None, self.dna.output_shape], name="labels")
         self.is_training = tf.placeholder(tf.bool, name="is_training")
@@ -105,6 +108,9 @@ class NN:
         elif self.input_dim == 2:
             # 2D input
             input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], 1])
+        elif self.input_dim == 3:
+            # 3D input (RGB)
+            input_layer = tf.reshape(self.input, [-1, self.dna.input_shape[0], self.dna.input_shape[1], self.dna.input_shape[2], 1])
 
         # push all outgoing edges to the queue
         for edge_out in self.root.edges_out:

@@ -167,9 +167,13 @@
         "desc": "Default stride for convolutional layers (Edge)",
         "value": [1, 1]
     },
-    "INPUT_SHAPE": {
-        "desc": "Shape of the neural network input",
+    "INPUT_SHAPE_MNIST": {
+        "desc": "Shape of the neural network input (MNIST)",
         "value": [28, 28]
+    },
+    "INPUT_SHAPE_CIFAR10": {
+        "desc": "Shape of the neural network input (CIFAR10)",
+        "value": [32, 32, 3]
     },
     "OUTPUT_SHAPE": {
         "desc": "Shape of the neural network output",
