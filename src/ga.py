@@ -95,7 +95,7 @@ class GeneticAlgorithm(object):
             # breed the best individuals together
             for best_i in range(Settings.N_BEST_CANDIDATES):
                 for best_j in range(best_i + 1, Settings.N_BEST_CANDIDATES):
-                    print("==========================================")
+                    print("\a==========================================")
                     print("Breeding individuals", best_i, "and", best_j,
                           "(out of", Settings.N_BEST_CANDIDATES, ")")
                     self.attempt_breeding(best_i, best_j)
@@ -106,7 +106,7 @@ class GeneticAlgorithm(object):
             # breed each best individual with a random individual from the population
             # including itself because, well.. parthenogenesis and all..
             for best_i in range(Settings.N_BEST_CANDIDATES):
-                print("==========================================")
+                print("\a==========================================")
                 print("Breeding individual", best_i, "(out of",
                       Settings.N_BEST_CANDIDATES, ") with a RANDOM individual")
                 other_i = randint(0, self.population_size - 1)
@@ -118,7 +118,7 @@ class GeneticAlgorithm(object):
             # breed two different random individuals together until the number of offsprings
             # reaches the maximum population size
             while(len(self.next_generation_dna) < self.population_size):
-                print("==========================================")
+                print("\a==========================================")
                 print("Breeding random individuals together (",
                       self.population_size - len(self.next_generation_dna),
                       "random breedings to complete population)")
@@ -182,6 +182,10 @@ class GeneticAlgorithm(object):
         breeding_attempts = 0
 
         while(successful_breedings < 2 and breeding_attempts < Settings.MAX_BREEDING_ATTEMPTS):
+            print("==========================================")
+            print("Succesful breedings: ", successful_breedings, "/ 2",
+                  "\nBreeding attempts:", breeding_attempts, "/",
+                  Settings.MAX_BREEDING_ATTEMPTS)
 
             try:
                 # cross over the two individuals
@@ -219,6 +223,7 @@ class GeneticAlgorithm(object):
                     except Exception as e:
                         print("Failed to build the NN \n\n" + str(e))
 
+            breeding_attempts += 1
 
         return(successful_breedings)
 
