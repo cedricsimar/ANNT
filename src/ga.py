@@ -85,9 +85,11 @@ class GeneticAlgorithm(object):
             # save the best individuals (N_BEST_CANDIDATES),
             # they go through the next generation unchanged.
             for best_i in range(Settings.N_BEST_CANDIDATES):
-
                 self.next_generation_dna.append(self.population[best_i])
                 self.next_generation_fitness.append(self.fitness[best_i])
+
+            currTime = time.time()
+            timeDif = currTime - beginTime
 
             print("\a-------------------------------------------------")
             print("BREEDING BEST INDIVIDUALS (GEN " + str(self.generation) + ")")
@@ -95,6 +97,17 @@ class GeneticAlgorithm(object):
             # breed the best individuals together
             for best_i in range(Settings.N_BEST_CANDIDATES):
                 for best_j in range(best_i + 1, Settings.N_BEST_CANDIDATES):
+
+                    currTime = time.time()
+                    # if the CHECK_TIME cycle just looped, write info.
+                    if (currTime - beginTime) % Settings.CHECK_TIME < timeDif % Settings.CHECK_TIME:
+                        self.gentimes_writer.write(
+                            'Generation #' + str(self.generation) + ' time: '
+                            + str(currTime - beginTime) + 's\tindividuals: '
+                            + str(len(self.next_generation_dna)) + ' out of '
+                            + str(self.population_size) + '\n')
+                    timeDif = currTime - beginTime
+
                     print("\a==========================================")
                     print("Breeding individuals", best_i, "and", best_j,
                           "(out of", Settings.N_BEST_CANDIDATES, ")")
@@ -106,6 +119,17 @@ class GeneticAlgorithm(object):
             # breed each best individual with a random individual from the population
             # including itself because, well.. parthenogenesis and all..
             for best_i in range(Settings.N_BEST_CANDIDATES):
+
+                currTime = time.time()
+                # if the CHECK_TIME cycle just looped, write info.
+                if (currTime - beginTime) % Settings.CHECK_TIME < timeDif % Settings.CHECK_TIME:
+                    self.gentimes_writer.write(
+                        'Generation #' + str(self.generation) + ' time: '
+                        + str(currTime - beginTime) + 's\tindividuals: '
+                        + str(len(self.next_generation_dna)) + ' out of '
+                        + str(self.population_size) + '\n')
+                timeDif = currTime - beginTime
+
                 print("\a==========================================")
                 print("Breeding individual", best_i, "(out of",
                       Settings.N_BEST_CANDIDATES, ") with a RANDOM individual")
@@ -117,7 +141,25 @@ class GeneticAlgorithm(object):
             print("-------------------------------------------------")
             # breed two different random individuals together until the number of offsprings
             # reaches the maximum population size
+
+            print("Number of individuals already produced:",
+                  len(self.next_generation_dna), "out of", self.population_size)
+
             while(len(self.next_generation_dna) < self.population_size):
+
+                currTime = time.time()
+                # if the CHECK_TIME cycle just looped, write info.
+                if (currTime - beginTime) % Settings.CHECK_TIME < timeDif % Settings.CHECK_TIME:
+                    self.gentimes_writer.write(
+                        'Generation #' + str(self.generation) + ' time: '
+                        + str(currTime - beginTime) + 's\tindividuals: '
+                        + str(len(self.next_generation_dna)) + ' out of '
+                        + str(self.population_size) + '\n')
+                timeDif = currTime - beginTime
+                # if PATIENCE_TIME has already elapsed, end this generation.
+                if timeDif > Settings.PATIENCE_TIME:
+                    break
+
                 print("\a==========================================")
                 print("Breeding random individuals together (",
                       self.population_size - len(self.next_generation_dna),
@@ -147,8 +189,8 @@ class GeneticAlgorithm(object):
                 self.mutations_per_breeding = 1
 
             # save generation checkpoint
-            self.save_generation_checkpoint()
-            endTime = time.time()
+            #self.save_generation_checkpoint()
+            currTime = time.time()
 
             print("\n ===============================================")
             print("\n ============== END OF GENERATION ==============")
@@ -156,12 +198,13 @@ class GeneticAlgorithm(object):
             best_so_far = max(self.best_generations_fitness)
             print("The best individual so far is from generation", self.best_generations_fitness.index(best_so_far),
                   "with a fitness of ", best_so_far)
-            print('TIME TAKEN FOR EXECUTING THIS GENERATION: {:5.2f}s\n'.format(endTime - beginTime))
+            print('TIME TAKEN FOR EXECUTING THIS GENERATION: {:5.2f}s\n'.format(currTime - beginTime))
             print("\n ===============================================")
-
-            self.gentimes_writer.write('Generation #' + str(self.generation)
-                                       + ' time: ' + str(endTime - beginTime)
-                                       + 's\n')
+            self.gentimes_writer.write(
+                'Generation #' + str(self.generation) + ' time: '
+                + str(currTime - beginTime) + 's\tindividuals: '
+                + str(len(self.next_generation_dna)) + ' out of '
+                + str(self.population_size) + '\n')
 
 
     def attempt_breeding(self, individual_i, individual_j):
