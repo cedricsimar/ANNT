@@ -37,7 +37,7 @@
     },
     "POPULATION_SIZE": {
         "desc": "Number of individuals in the population",
-        "value": 15
+        "value": 30
     },
     "MAX_GENERATIONS": {
         "desc": "Maximum number of generations to evolve",
@@ -49,7 +49,7 @@
     },
     "N_BEST_CANDIDATES": {
         "desc": "Number of best candidates that will constitute a major basis of the next generation",
-        "value": 2
+        "value": 4
     },
     "MAX_BREEDING_ATTEMPTS": {
         "desc": "Maximum number of breeding attemps between two parents",
@@ -202,13 +202,5 @@
     "LEARNING_RATE": {
         "desc": "Optimizer learning rate (default: 0.001)",
         "value": 0.01
-    },
-    "CHECK_TIME": {
-        "desc": "Time cycle for writing the state of the generation's breeding (default: 900 sec)",
-        "value": 450
-    },
-    "PATIENCE_TIME": {
-        "desc": "Time before stopping the generation's breeding",
-        "value": 7200
     }
 }

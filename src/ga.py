@@ -19,7 +19,8 @@ import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data as mnist_input
 import cifar10 as cifar10_input
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 class GeneticAlgorithm(object):
@@ -89,7 +90,6 @@ class GeneticAlgorithm(object):
                 self.next_generation_fitness.append(self.fitness[best_i])
 
             currTime = time.time()
-            timeDif = currTime - beginTime
 
             print("\a-------------------------------------------------")
             print("BREEDING BEST INDIVIDUALS (GEN " + str(self.generation) + ")")
@@ -99,14 +99,14 @@ class GeneticAlgorithm(object):
                 for best_j in range(best_i + 1, Settings.N_BEST_CANDIDATES):
 
                     currTime = time.time()
-                    # if the CHECK_TIME cycle just looped, write info.
-                    if (currTime - beginTime) % Settings.CHECK_TIME < timeDif % Settings.CHECK_TIME:
-                        self.gentimes_writer.write(
-                            'Generation #' + str(self.generation) + ' time: '
-                            + str(currTime - beginTime) + 's\tindividuals: '
-                            + str(len(self.next_generation_dna)) + ' out of '
-                            + str(self.population_size) + '\n')
-                    timeDif = currTime - beginTime
+                    print("Time:" + str(currTime - beginTime) + "s\tIndividuals:"
+                          + str(len(self.next_generation_dna))
+                          + " out of " + str(self.population_size))
+                    self.gentimes_writer.write(
+                        'Generation #' + str(self.generation) + ' time: '
+                        + str(currTime - beginTime) + 's\tindividuals: '
+                        + str(len(self.next_generation_dna)) + ' out of '
+                        + str(self.population_size) + '\n')
 
                     print("\a==========================================")
                     print("Breeding individuals", best_i, "and", best_j,
@@ -121,14 +121,14 @@ class GeneticAlgorithm(object):
             for best_i in range(Settings.N_BEST_CANDIDATES):
 
                 currTime = time.time()
-                # if the CHECK_TIME cycle just looped, write info.
-                if (currTime - beginTime) % Settings.CHECK_TIME < timeDif % Settings.CHECK_TIME:
-                    self.gentimes_writer.write(
-                        'Generation #' + str(self.generation) + ' time: '
-                        + str(currTime - beginTime) + 's\tindividuals: '
-                        + str(len(self.next_generation_dna)) + ' out of '
-                        + str(self.population_size) + '\n')
-                timeDif = currTime - beginTime
+                print("Time:" + str(currTime - beginTime) + "s\tIndividuals:"
+                      + str(len(self.next_generation_dna))
+                      + " out of " + str(self.population_size))
+                self.gentimes_writer.write(
+                    'Generation #' + str(self.generation) + ' time: '
+                    + str(currTime - beginTime) + 's\tindividuals: '
+                    + str(len(self.next_generation_dna)) + ' out of '
+                    + str(self.population_size) + '\n')
 
                 print("\a==========================================")
                 print("Breeding individual", best_i, "(out of",
@@ -142,23 +142,17 @@ class GeneticAlgorithm(object):
             # breed two different random individuals together until the number of offsprings
             # reaches the maximum population size
 
-            print("Number of individuals already produced:",
-                  len(self.next_generation_dna), "out of", self.population_size)
-
             while(len(self.next_generation_dna) < self.population_size):
 
                 currTime = time.time()
-                # if the CHECK_TIME cycle just looped, write info.
-                if (currTime - beginTime) % Settings.CHECK_TIME < timeDif % Settings.CHECK_TIME:
-                    self.gentimes_writer.write(
-                        'Generation #' + str(self.generation) + ' time: '
-                        + str(currTime - beginTime) + 's\tindividuals: '
-                        + str(len(self.next_generation_dna)) + ' out of '
-                        + str(self.population_size) + '\n')
-                timeDif = currTime - beginTime
-                # if PATIENCE_TIME has already elapsed, end this generation.
-                if timeDif > Settings.PATIENCE_TIME:
-                    break
+                print("Time:" + str(currTime - beginTime) + "s\tIndividuals:"
+                      + str(len(self.next_generation_dna))
+                      + " out of " + str(self.population_size))
+                self.gentimes_writer.write(
+                    'Generation #' + str(self.generation) + ' time: '
+                    + str(currTime - beginTime) + 's\tindividuals: '
+                    + str(len(self.next_generation_dna)) + ' out of '
+                    + str(self.population_size) + '\n')
 
                 print("\a==========================================")
                 print("Breeding random individuals together (",
@@ -259,9 +253,12 @@ class GeneticAlgorithm(object):
                     try:
                         mutated_offspring_fitness = self.build_and_train_network(mutated_offspring)
 
-                        self.next_generation_dna.append(mutated_offspring)
-                        self.next_generation_fitness.append(mutated_offspring_fitness)
-                        successful_breedings += 1
+                        if mutated_offspring_fitness == 2:
+                            raise RuntimeError('The generated network could not be built.')
+                        else:
+                            self.next_generation_dna.append(mutated_offspring)
+                            self.next_generation_fitness.append(mutated_offspring_fitness)
+                            successful_breedings += 1
 
                     except Exception as e:
                         print("Failed to build the NN \n\n" + str(e))
@@ -308,48 +305,52 @@ class GeneticAlgorithm(object):
                 merged_summaries = tf.summary.merge_all()
                 writer = tf.summary.FileWriter(Settings.TMP_FOLDER_PATH + self.dataset + "\\", sess.graph)
 
-                # initialize variables and finalize the graph
-                sess.run(tf.global_variables_initializer())
-                sess.graph.finalize()
+                try:
+                    # initialize variables and finalize the graph
+                    sess.run(tf.global_variables_initializer())
+                    sess.graph.finalize()
 
-                for training_step in range(Settings.TRAINING_STEPS):
+                    for training_step in range(Settings.TRAINING_STEPS):
 
-                    # training step
-                    images, labels = self.data.train.next_batch(Settings.MINIBATCH_SIZE)
-                    if(self.dataset == 'm'):
-                        images = reshape_mnist_images(images)
-                    else:
-                        images = reshape_cifar10_images(images)
-
-                    sess.run(nn.optimize, {nn.input: images, nn.labels: labels, nn.is_training: True})
-
-                    # performance evaluation every few training steps
-                    if not training_step % Settings.EVALUATION_RATE:
-
-                        test_images, test_labels = self.data.test.next_batch(Settings.TEST_BATCH_SIZE)
+                        # training step
+                        images, labels = self.data.train.next_batch(Settings.MINIBATCH_SIZE)
                         if(self.dataset == 'm'):
-                            test_images = reshape_mnist_images(test_images)
+                            images = reshape_mnist_images(images)
                         else:
-                            test_images = reshape_cifar10_images(test_images)
+                            images = reshape_cifar10_images(images)
 
-                        summary, validation_error = sess.run([merged_summaries, nn.prediction_error], {nn.input: test_images, nn.labels: test_labels, nn.is_training: False})
-                        writer.add_summary(summary, training_step)
-                        print('Test error {:6.2f}%'.format(100 * validation_error))
-                        best_validation_error = min(best_validation_error, validation_error)
+                        sess.run(nn.optimize, {nn.input: images, nn.labels: labels, nn.is_training: True})
 
-                # close the writer
-                writer.close()
+                        # performance evaluation every few training steps
+                        if not training_step % Settings.EVALUATION_RATE:
 
-                # save graph logs and dna string into the right models folder
-                model_path = Settings.MODELS_FOLDER_PATH + self.dataset + "\\" + str(self.generation) + "\\" + "{:f}".format(best_validation_error)
+                            test_images, test_labels = self.data.test.next_batch(Settings.TEST_BATCH_SIZE)
+                            if(self.dataset == 'm'):
+                                test_images = reshape_mnist_images(test_images)
+                            else:
+                                test_images = reshape_cifar10_images(test_images)
 
-                copy_files_from_to(Settings.TMP_FOLDER_PATH + self.dataset + "\\", model_path)
+                            summary, validation_error = sess.run([merged_summaries, nn.prediction_error], {nn.input: test_images, nn.labels: test_labels, nn.is_training: False})
+                            writer.add_summary(summary, training_step)
+                            print('Test error {:6.2f}%'.format(100 * validation_error))
+                            best_validation_error = min(best_validation_error, validation_error)
 
-                file_path = model_path + "\\topology.txt"
-                with open(file_path, 'a') as topo_file:
-                    topo_file.write(nn.dna.__str__())
+                    # save graph logs and dna string into the right models folder
+                    model_path = Settings.MODELS_FOLDER_PATH + self.dataset + "\\" + str(self.generation) + "\\" + "{:f}".format(best_validation_error)
+                    copy_files_from_to(Settings.TMP_FOLDER_PATH + self.dataset + "\\", model_path)
+                    file_path = model_path + "\\topology.txt"
+                    with open(file_path, 'a') as topo_file:
+                        topo_file.write(nn.dna.__str__())
 
-        print("Training and Saving complete !\n\n")
+                    print("Training and Saving complete !\n\n")
+
+                except Exception as e:
+                    print("Exception while building the NN \n\n" + str(e))
+                    best_validation_error = 2
+
+                finally:
+                    # close the writer
+                    writer.close()
 
         return(best_validation_error)
 
