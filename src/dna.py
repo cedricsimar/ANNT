@@ -11,7 +11,7 @@ class DNA:
     """
 
     def __init__(self, input_shape, output_shape, multiclass=False):
-        
+
         self.input_shape = input_shape
         self.output_shape = output_shape
         self.multiclass = multiclass
@@ -29,19 +29,19 @@ class DNA:
     def __lt__(self, dna2):
         # IDs are unique globally
         return(self.input_vertex_id < dna2.input_vertex_id)
-    
+
 
     def add_vertex(self, v):
 
         if(v.id not in self.vertices):
             self.vertices[v.id] = v
-            
+
 
     def add_edge(self, e):
 
         if(e.id not in self.edges):
             self.edges[e.id] = e
-            
+
 
     def remove_vertex(self, v):
 
@@ -73,18 +73,18 @@ class DNA:
                 dna_str += "Sum - "
             elif(v.action == 2):
                 dna_str += "Concatenation - "
-            
+
             if(v.activation):
                 dna_str += "ReLu - "
             else:
                 dna_str += "Linear - "
-            
+
             if(v.max_pooling):
                 dna_str += "Max Pooling - "
-            
+
             if(v.dropout):
                 dna_str += "Dropout - "
-            
+
             if(v.flatten):
                 dna_str += "Flatten"
 
@@ -95,7 +95,7 @@ class DNA:
             dna_str += "\nOutput edges : "
             for e_out in v.edges_out:
                 dna_str += str(e_out.id) + "  "
-        
+
         dna_str += "\n\n"
         dna_str += "Edges\n"
         dna_str += "-----\n\n"
@@ -134,20 +134,20 @@ class DNA:
                 print("No action - ", end='')
             elif(v.action == 1):
                 print("Sum - ", end='')
-            elif(v.action == 1):
+            elif(v.action == 2):
                 print("Concatenation - ", end='')
-            
+
             if(v.activation):
                 print("ReLu - ", end='')
             else:
                 print("Linear - ", end='')
-            
+
             if(v.max_pooling):
                 print("Max Pooling - ", end='')
-            
+
             if(v.dropout):
                 print("Dropout - ", end='')
-            
+
             if(v.flatten):
                 print("Flatten", end='')
 
@@ -175,22 +175,22 @@ class DNA:
                 print("Convolutional layer\n")
             elif e.type == Settings.IDENTITY:
                 print("Identity layer\n")
-        
+
         print("\n")
-        
+
 
     def create_primitive_structure(self):
 
         """
         Create a primitive neural network structure that flattens the input and
         uses one dense layer to map the flatten input to the output shape
-        The primitive structure should also make possible the evolution toward 
-        a more sophisticated topology 
+        The primitive structure should also make possible the evolution toward
+        a more sophisticated topology
 
         [input] --- id --- [flatten] --- id --- [buffer] --- fc --- [output]
         """
-    
-        # create input vertex  
+
+        # create input vertex
         self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, True, False])
         self.input_vertex_id = Settings.GLOBAL_VERTEX_ID
         Settings.GLOBAL_VERTEX_ID += 1

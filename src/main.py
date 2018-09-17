@@ -16,7 +16,7 @@ def main():
     print("\a----------------------------------------------------")
     print("---------------EVOLUTIONARY ALGORITHM---------------")
     print("----------------------------------------------------\n")
-    GA.evolve(3)
+    GA.evolve(50)
     GA.gentimes_writer.close()
 
 if __name__ == "__main__":

@@ -51,6 +51,7 @@ class GeneticAlgorithm(object):
 
         # If there is a check point, load it, otherwise start with an initial population.
         if not os.path.exists(Settings.CHECKPOINT_PATH + self.dataset + "\\"):
+            os.mkdir(Settings.CHECKPOINT_PATH)
             os.mkdir(Settings.CHECKPOINT_PATH + self.dataset + "\\")
 
         self.start_generation = len(os.listdir(Settings.CHECKPOINT_PATH + self.dataset + "\\")) - 1
@@ -64,6 +65,7 @@ class GeneticAlgorithm(object):
             print('TIME TAKEN FOR PRODUCING INITIAL POPULATION: {:5.2f}s\n'.format(endTime - beginTime))
             self.gentimes_writer.write(
                 'Initial population time: ' + str(endTime - beginTime) + 's\n')
+            self.start_generation += 1
 
 
     def evolve(self, num_generations):
@@ -183,13 +185,13 @@ class GeneticAlgorithm(object):
                 self.mutations_per_breeding = 1
 
             # save generation checkpoint
-            #self.save_generation_checkpoint()
+            self.save_generation_checkpoint()
             currTime = time.time()
 
             print("\n ===============================================")
             print("\n ============== END OF GENERATION ==============")
             print("\nFitness history through generations :", self.best_generations_fitness)
-            best_so_far = max(self.best_generations_fitness)
+            best_so_far = min(self.best_generations_fitness)
             print("The best individual so far is from generation", self.best_generations_fitness.index(best_so_far),
                   "with a fitness of ", best_so_far)
             print('TIME TAKEN FOR EXECUTING THIS GENERATION: {:5.2f}s\n'.format(currTime - beginTime))
