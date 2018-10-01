@@ -43,9 +43,13 @@
         "desc": "Maximum number of generations to evolve",
         "value": 110
     },
-    "MAX_TRAINABLE_PARAMETERS": {
-        "desc": "Maximum number of trainable parameters ",
+    "MAX_TRAINABLE_PARAMETERS_CPU": {
+        "desc": "Maximum number of trainable parameters for CPU",
         "value": 1200000
+    },
+    "MAX_TRAINABLE_PARAMETERS_GPU": {
+        "desc": "Maximum number of trainable parameters for GPU",
+        "value": 2400000
     },
     "N_BEST_CANDIDATES": {
         "desc": "Number of best candidates that will constitute a major basis of the next generation",
@@ -160,12 +164,12 @@
         "value": [8, 16, 32]
     },
     "DEFAULT_KERNEL_SHAPE": {
-        "desc": "Default kernel shape for convolutional layers (Edge)",
-        "value": [3, 3]
+        "desc": "Default kernel shape (same in all directions) for convolutional layers (Edge)",
+        "value": 3
     },
     "DEFAULT_STRIDE": {
-        "desc": "Default stride for convolutional layers (Edge)",
-        "value": [1, 1]
+        "desc": "Default stride (same in all directions) for convolutional layers (Edge)",
+        "value": 1
     },
     "INPUT_SHAPE_MNIST": {
         "desc": "Shape of the neural network input (MNIST)",

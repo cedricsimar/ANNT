@@ -20,7 +20,7 @@ from tensorflow.examples.tutorials.mnist import input_data as mnist_input
 import cifar10 as cifar10_input
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 class GeneticAlgorithm(object):
@@ -190,7 +190,7 @@ class GeneticAlgorithm(object):
 
             print("\n ===============================================")
             print("\n ============== END OF GENERATION ==============")
-            print("\nFitness history through generations :", self.best_generations_fitness)
+            print("\nFitness history through generations:", self.best_generations_fitness)
             best_so_far = min(self.best_generations_fitness)
             print("The best individual so far is from generation", self.best_generations_fitness.index(best_so_far),
                   "with a fitness of ", best_so_far)
@@ -288,17 +288,19 @@ class GeneticAlgorithm(object):
             # and train the resulting model
             num_trainable_variables = np.sum([np.prod(v.shape) for v in tf.trainable_variables()])
             print("==========================================")
-            print("Number of trainable variables :", num_trainable_variables)
+            print("Number of trainable variables:", num_trainable_variables)
             print("Training the following DNA: \n")
             print(nn.dna)
 
-            if(num_trainable_variables > Settings.MAX_TRAINABLE_PARAMETERS):
+            if(num_trainable_variables > Settings.MAX_TRAINABLE_PARAMETERS_GPU):
+                print("Trainable variables:", num_trainable_variables,
+                      "out of", Settings.MAX_TRAINABLE_PARAMETERS_GPU)
                 raise SaveMyLaptopException()
 
             # Configure GPU options to avoid memory fragmentation.
             config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            #config.gpu_options.per_process_gpu_memory_fraction = 0.3
+            #config.gpu_options.allow_growth = True
+            config.gpu_options.per_process_gpu_memory_fraction = 0.7
 
             with tf.Session(graph=graph, config=config) as sess:
 
@@ -372,7 +374,7 @@ class GeneticAlgorithm(object):
                 individual_dna = DNA(Settings.INPUT_SHAPE_MNIST, Settings.OUTPUT_SHAPE)
             else:
                 individual_dna = DNA(Settings.INPUT_SHAPE_CIFAR10, Settings.OUTPUT_SHAPE)
-            individual_dna.create_primitive_structure()
+            individual_dna.create_primitive_structure_conv()
 
             individual_fitness = self.build_and_train_network(individual_dna)
 

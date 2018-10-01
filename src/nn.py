@@ -217,13 +217,16 @@ class NN:
                     tensor = self.vertices_tensor[e.from_vertex.id]
 
                     if e.type == Settings.FULLY_CONNECTED:
-
                         tensor = tf.layers.dense(tensor, e.units, use_bias=True, kernel_initializer = glorot_uniform_initializer())
 
                     elif e.type == Settings.CONVOLUTIONAL:
-
-                        tensor=tf.layers.conv2d(tensor, e.kernels, e.kernel_shape, e.stride, padding="same",
-                                                kernel_initializer = glorot_uniform_initializer())
+                        # Identify the dimensions for the convolution.
+                        if len(tensor.get_shape()) == 4:
+                            tensor=tf.layers.conv2d(tensor, e.kernels, e.kernel_shape, e.kernel_stride, padding="same", kernel_initializer = glorot_uniform_initializer())
+                        elif len(tensor.get_shape()) == 5:
+                            tensor=tf.layers.conv3d(tensor, e.kernels, e.kernel_shape, e.kernel_stride, padding="same", kernel_initializer = glorot_uniform_initializer())
+                        else:
+                            tensor=tf.layers.conv1d(tensor, e.kernels, e.kernel_shape, e.kernel_stride, padding="same", kernel_initializer = glorot_uniform_initializer())
 
                     # add the resulting tensor in the edges dictionary
                     self.edges_tensor[e.id] = tensor
@@ -333,13 +336,16 @@ class NN:
         tensor = self.vertices_tensor[e.from_vertex.id]
 
         if e.type == Settings.FULLY_CONNECTED:
-
             tensor = tf.layers.dense(tensor, e.units, use_bias=True, kernel_initializer = glorot_uniform_initializer())
 
         elif e.type == Settings.CONVOLUTIONAL:
-
-            tensor=tf.layers.conv2d(tensor, e.kernels, e.kernel_shape, e.stride, padding="same",
-                                    kernel_initializer = glorot_uniform_initializer())
+            # Identify the dimensions for the convolution.
+            if len(tensor.get_shape()) == 4:
+                tensor=tf.layers.conv2d(tensor, e.kernels, e.kernel_shape, e.kernel_stride, padding="same", kernel_initializer = glorot_uniform_initializer())
+            elif len(tensor.get_shape()) == 5:
+                tensor=tf.layers.conv3d(tensor, e.kernels, e.kernel_shape, e.kernel_stride, padding="same", kernel_initializer = glorot_uniform_initializer())
+            else:
+                tensor=tf.layers.conv1d(tensor, e.kernels, e.kernel_shape, e.kernel_stride, padding="same", kernel_initializer = glorot_uniform_initializer())
 
         return (tensor)
 

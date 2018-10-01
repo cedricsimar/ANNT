@@ -88,11 +88,11 @@ class DNA:
             if(v.flatten):
                 dna_str += "Flatten"
 
-            dna_str += "\nInput edges : "
+            dna_str += "\nInput edges: "
             for e_in in v.edges_in:
                 dna_str += str(e_in.id) + "  "
 
-            dna_str += "\nOutput edges : "
+            dna_str += "\nOutput edges: "
             for e_out in v.edges_out:
                 dna_str += str(e_out.id) + "  "
 
@@ -107,9 +107,13 @@ class DNA:
             dna_str += "Edge " + str(e.id) + " from " + str(e.from_vertex.id) + " to " + str(e.to_vertex.id) + ": "
 
             if e.type == Settings.FULLY_CONNECTED:
-                dna_str += "Fully connected layer\n\n"
+                dna_str += "Fully connected layer\n"
+                dna_str += "Units: " + str(e.units) + "\n\n"
             elif e.type == Settings.CONVOLUTIONAL:
-                dna_str += "Convolutional layer\n\n"
+                dna_str += "Convolutional layer\n"
+                dna_str += "Kernels: " + str(e.kernels) + "\n"
+                dna_str += "Kernel shape: " + str(e.kernel_shape) + "\n"
+                dna_str += "Kernel stride: " + str(e.kernel_stride) + "\n\n"
             elif e.type == Settings.IDENTITY:
                 dna_str += "Identity layer\n\n"
 
@@ -151,11 +155,11 @@ class DNA:
             if(v.flatten):
                 print("Flatten", end='')
 
-            print("\nInput edges : ", end='')
+            print("\nInput edges: ", end='')
             for e_in in v.edges_in:
                 print(str(e_in.id) + "  ", end='')
 
-            print("\nOutput edges : ", end='')
+            print("\nOutput edges: ", end='')
             for e_out in v.edges_out:
                 print(str(e_out.id) + "  ", end='')
 
@@ -170,22 +174,95 @@ class DNA:
             print("Edge " + str(e.id) + " from " + str(e.from_vertex.id) + " to " + str(e.to_vertex.id) + ": ", end='')
 
             if e.type == Settings.FULLY_CONNECTED:
-                print("Fully connected layer\n")
+                print("Fully connected layer")
+                print("Units:", e.units, "\n")
             elif e.type == Settings.CONVOLUTIONAL:
-                print("Convolutional layer\n")
+                print("Convolutional layer")
+                print("Kernels:", e.kernels)
+                print("Kernel shape:", e.kernel_shape)
+                print("Kernel stride:", e.kernel_stride, "\n")
             elif e.type == Settings.IDENTITY:
                 print("Identity layer\n")
 
         print("\n")
 
 
+    def create_primitive_structure_conv(self):
+
+        """
+        Create a primitive convolutional neural network structure.
+        This structure uses one convolutional layer, then flattens the input
+        and uses one dense layer to map the flattened input to the output shape
+        The primitive structure should also make possible the evolution toward
+        a more sophisticated topology.
+
+        [input] --- conv --- [flatten] --- fc --- [buffer] --- fc --- [output]
+        """
+
+        # create input vertex
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, True, False])
+        self.input_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
+
+        # create flatten vertex
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[True, True, True], flatten=Settings.FLATTEN)
+        self.flatten_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
+
+        # create buffer vertex
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[True, False, True])
+        self.buffer_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
+
+        # create output vertex
+        self.vertices[Settings.GLOBAL_VERTEX_ID] = Vertex(Settings.GLOBAL_VERTEX_ID, mutable=[False, False, False])
+        self.output_vertex_id = Settings.GLOBAL_VERTEX_ID
+        Settings.GLOBAL_VERTEX_ID += 1
+
+        # create a convolutional edge to connect the input with the flatten vertex
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[self.input_vertex_id], self.vertices[self.flatten_vertex_id], type=Settings.CONVOLUTIONAL)
+        input_to_flatten_edge_id = Settings.GLOBAL_EDGE_ID
+        Settings.GLOBAL_EDGE_ID += 1
+
+        # create a fc edge to connect the flatten with the buffer vertex
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[self.flatten_vertex_id], self.vertices[self.buffer_vertex_id], type=Settings.FULLY_CONNECTED)
+        flatten_to_buffer_edge_id = Settings.GLOBAL_EDGE_ID
+        Settings.GLOBAL_EDGE_ID += 1
+
+        # create non-mutable fc edge between the buffer and output vertex with the number of units equal to the output shape
+        self.edges[Settings.GLOBAL_EDGE_ID] = Edge(Settings.GLOBAL_EDGE_ID, self.vertices[self.buffer_vertex_id], self.vertices[self.output_vertex_id], units=self.output_shape, mutable=[False, False, False])
+        buffer_to_output_edge_id = Settings.GLOBAL_EDGE_ID
+        Settings.GLOBAL_EDGE_ID += 1
+
+        # link the vertices and edges of the graph to connect the input with the output
+        # switch on mutability temporarily
+        self.vertices[self.buffer_vertex_id].mutable_out = True
+        self.vertices[self.output_vertex_id].mutable_in = True
+
+        # add the link between the input and flatten vertex
+        self.vertices[self.input_vertex_id].add_edge_out(self.edges[input_to_flatten_edge_id])
+        self.vertices[self.flatten_vertex_id].add_edge_in(self.edges[input_to_flatten_edge_id])
+
+        # add the link between the flatten and buffer vertex
+        self.vertices[self.flatten_vertex_id].add_edge_out(self.edges[flatten_to_buffer_edge_id])
+        self.vertices[self.buffer_vertex_id].add_edge_in(self.edges[flatten_to_buffer_edge_id])
+
+        # add the link between the buffer and output vertex
+        self.vertices[self.buffer_vertex_id].add_edge_out(self.edges[buffer_to_output_edge_id])
+        self.vertices[self.output_vertex_id].add_edge_in(self.edges[buffer_to_output_edge_id])
+
+        # switch mutability back off
+        self.vertices[self.buffer_vertex_id].mutable_out = False
+        self.vertices[self.output_vertex_id].mutable_in = False
+
+
     def create_primitive_structure(self):
 
         """
         Create a primitive neural network structure that flattens the input and
-        uses one dense layer to map the flatten input to the output shape
+        uses one dense layer to map the flattened input to the output shape
         The primitive structure should also make possible the evolution toward
-        a more sophisticated topology
+        a more sophisticated topology.
 
         [input] --- id --- [flatten] --- id --- [buffer] --- fc --- [output]
         """
